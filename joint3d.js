@@ -33,9 +33,10 @@ class DualIMUJoint3D {
 
     // Scene Hierarchy
     this.rootGroup = null;
-    this.proximalGroup = null;     // Femur / Forearm + XIAO Display + Sensor #1 (0x69)
-    this.jointPivot = null;        // Knee / Wrist Joint Center at (0, 0, 0)
+    this.proximalGroup = null;     // Femur / Forearm + XIAO Display + Sensor #1 (0x69), pivots at Hip (0, 1.55, 0)
+    this.jointPivot = null;        // Knee / Wrist Joint Center at distal end of Femur (local 0, -1.55, 0 -> world 0, 0, 0)
     this.distalGroup = null;       // Tibia + Fibula + Foot / Hand + Sensor #2 (0x68)
+    this.ringGroup = null;         // Sagittal & Frontal Protractor Rings + 3D Flexion Sector attached to jointPivot
     this.kneeModelGroup = null;
     this.wristModelGroup = null;
 
@@ -56,13 +57,22 @@ class DualIMUJoint3D {
     this.lcdCtx = null;
     this.lcdTexture = null;
 
-    // Quaternions for Sensor #1 (Proximal) and Sensor #2 (Distal)
+    // Quaternions & 3D Gravity Vectors for Sensor #1 (Proximal Femur) and Sensor #2 (Distal Tibia)
     this.q1Raw = new THREE.Quaternion();
     this.q2Raw = new THREE.Quaternion();
     this.q1Tare = new THREE.Quaternion();
     this.q1Smooth = new THREE.Quaternion();
     this.q2Smooth = new THREE.Quaternion();
+    this.s1GravTare = new THREE.Vector3(0, -1, 0);
+    this.s1GravCurrent = new THREE.Vector3(0, -1, 0);
+    this.s1LocalTare = new THREE.Vector3(1, 0, 0);
+    this.s1LocalCurrent = new THREE.Vector3(1, 0, 0);
+    this.hasTaredS1 = false;
+    this.s1TableYaw = 0;
+    this.lastKinematicsTime = performance.now();
     this.currentFeDeg = 0;
+    this.currentFemurPitchDeg = 0;
+    this.currentFemurRollDeg = 0;
 
     this.showAxes = true;
     this.jointPreset = 'KNEE';
@@ -87,7 +97,7 @@ class DualIMUJoint3D {
     // Lateral-oblique view looking at the lateral right knee (matching prototype photos)
     this.camera.position.set(3.2, 0.9, 6.2);
 
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, powerPreference: 'high-performance' });
     this.renderer.setSize(w, h);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     this.renderer.shadowMap.enabled = true;
@@ -132,8 +142,9 @@ class DualIMUJoint3D {
     grid.position.y = -3.85;
     this.scene.add(grid);
 
-    // Anatomical Joint Protractor Rings at Origin (0,0,0)
+    // Anatomical Joint Protractor Rings (attached to jointPivot so they travel with the knee joint)
     const ringGroup = new THREE.Group();
+    this.ringGroup = ringGroup;
     // Sagittal Flexion/Extension Plane (X-Y plane, Z normal)
     const sagGeo = new THREE.RingGeometry(1.42, 1.47, 64);
     const sagMat = new THREE.MeshBasicMaterial({
@@ -168,8 +179,6 @@ class DualIMUJoint3D {
     this.flexionSectorMesh = new THREE.Mesh(sectorGeo, sectorMat);
     this.flexionSectorMesh.position.z = 0.02;
     ringGroup.add(this.flexionSectorMesh);
-
-    this.scene.add(ringGroup);
   }
 
   createXIAOLcdTexture() {
@@ -283,18 +292,32 @@ class DualIMUJoint3D {
     this.rootGroup = new THREE.Group();
     this.scene.add(this.rootGroup);
 
-    //Coordinate System in Standing Posture (KNEE default):
+    // Coordinate System in Standing Posture (KNEE default):
     //   +Y = Superior (Upward toward Hip)
     //   -Y = Inferior (Downward toward Floor)
     //   +X = Anterior (Forward / Patella & Toes direction)
     //   -X = Posterior (Backward / Hamstring & Knee Flexion swing direction)
     //   +Z = Lateral (Outward side of right leg where XIAO, S1, and S2 are mounted)
+    //
+    // Realistic Hip-to-Knee Femur Pivot Hierarchy:
+    //   - proximalGroup is positioned at (0, 1.55, 0) (the upper-thigh / hip pivot center in world space).
+    //   - All femur meshes inside proximalGroup are offset by Y_OFF = -1.55 so in neutral standing (0°)
+    //     pose, the femur spans from y = +3.34 in world space down to the knee condyles at y = 0.0 in world space.
+    //   - jointPivot (the knee joint center) is placed at (0, -1.55, 0) inside proximalGroup so that when
+    //     Sensor #1 (0x69) tilts/rotates the femur, the knee joint, tibia, fibula, foot, and protractor rings
+    //     dynamically translate and rotate in 3D space with the distal femoral condyles.
+    const Y_OFF = -1.55;
     this.proximalGroup = new THREE.Group();
+    this.proximalGroup.position.set(0, 1.55, 0);
     this.rootGroup.add(this.proximalGroup);
 
     this.jointPivot = new THREE.Group();
-    this.jointPivot.position.set(0, 0, 0);
+    this.jointPivot.position.set(0, Y_OFF, 0);
     this.proximalGroup.add(this.jointPivot);
+
+    if (this.ringGroup) {
+      this.jointPivot.add(this.ringGroup);
+    }
 
     this.distalGroup = new THREE.Group();
     this.jointPivot.add(this.distalGroup);
@@ -333,62 +356,63 @@ class DualIMUJoint3D {
     // ========================================================================
     // 1. PROXIMAL SEGMENT: ANATOMICAL FEMUR + KNEE SLEEVE + XIAO + SENSOR #1
     // ========================================================================
-    // Femoral Shaft (extending from y = +0.25 up to y = +3.1)
+    // Femoral Shaft (extending from world y = +0.25 up to y = +3.1)
     const femurShaftGeo = new THREE.CylinderGeometry(0.23, 0.20, 2.75, 24);
     const femurShaft = new THREE.Mesh(femurShaftGeo, boneMat);
-    femurShaft.position.set(0, 1.62, 0);
+    femurShaft.position.set(0, 1.62 + Y_OFF, 0);
     femurShaft.castShadow = true;
     this.proximalGroup.add(femurShaft);
 
     // Distal Femoral Condyles (Medial & Lateral Condyles at the Knee Joint)
     const latCondyle = new THREE.Mesh(new THREE.SphereGeometry(0.32, 24, 18), boneMat);
     latCondyle.scale.set(1.22, 0.95, 0.75);
-    latCondyle.position.set(-0.04, 0.22, 0.21);
+    latCondyle.position.set(-0.04, 0.22 + Y_OFF, 0.21);
     this.proximalGroup.add(latCondyle);
 
     const medCondyle = new THREE.Mesh(new THREE.SphereGeometry(0.32, 24, 18), boneMat);
     medCondyle.scale.set(1.22, 0.95, 0.75);
-    medCondyle.position.set(-0.04, 0.22, -0.21);
+    medCondyle.position.set(-0.04, 0.22 + Y_OFF, -0.21);
     this.proximalGroup.add(medCondyle);
 
     // Distal Femoral Metaphysis Flare
     const femurFlare = new THREE.Mesh(new THREE.CylinderGeometry(0.21, 0.38, 0.65, 20), boneMat);
-    femurFlare.position.set(0, 0.55, 0);
+    femurFlare.position.set(0, 0.55 + Y_OFF, 0);
     this.proximalGroup.add(femurFlare);
 
     // Articular Cartilage Cap on Femoral Condyles
     const cartCap = new THREE.Mesh(new THREE.SphereGeometry(0.31, 20, 16), cartilageMat);
     cartCap.scale.set(1.18, 0.72, 1.35);
-    cartCap.position.set(0.02, 0.14, 0);
+    cartCap.position.set(0.02, 0.14 + Y_OFF, 0);
     this.proximalGroup.add(cartCap);
 
     // Proximal Femur: Greater Trochanter, Femoral Neck & Spherical Femoral Head
     const trochanter = new THREE.Mesh(new THREE.SphereGeometry(0.28, 18, 16), boneMat);
     trochanter.scale.set(0.9, 1.2, 0.85);
-    trochanter.position.set(0, 2.98, 0.16);
+    trochanter.position.set(0, 2.98 + Y_OFF, 0.16);
     this.proximalGroup.add(trochanter);
 
     const femNeck = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.18, 0.62, 16), boneMat);
-    femNeck.position.set(0, 3.12, -0.22);
+    femNeck.position.set(0, 3.12 + Y_OFF, -0.22);
     femNeck.rotation.x = -0.82;
     this.proximalGroup.add(femNeck);
 
     const femHead = new THREE.Mesh(new THREE.SphereGeometry(0.29, 24, 20), boneMat);
-    femHead.position.set(0, 3.34, -0.46);
+    femHead.position.set(0, 3.34 + Y_OFF, -0.46);
     this.proximalGroup.add(femHead);
 
     // Upper Thigh Soft-Tissue Silhouette (translucent so bone + hardware remain crisp)
     const thighSilhouette = new THREE.Mesh(new THREE.CylinderGeometry(0.66, 0.52, 2.5, 28, 1, true), limbSkinMat);
-    thighSilhouette.position.set(0, 1.75, 0);
+    thighSilhouette.position.set(0, 1.75 + Y_OFF, 0);
     this.proximalGroup.add(thighSilhouette);
 
     // Upper Cuff of Athletic Compression Knee Sleeve (matching Photo 1)
     const upperSleeve = new THREE.Mesh(new THREE.CylinderGeometry(0.54, 0.48, 1.25, 28), sleeveMat);
-    upperSleeve.position.set(0, 0.72, 0);
+    upperSleeve.position.set(0, 0.72 + Y_OFF, 0);
     this.proximalGroup.add(upperSleeve);
 
-    // Patella (Kneecap) on Anterior (+X) aspect of the Knee Joint
+    // Patella (Kneecap) on Anterior (+X) aspect of the Knee Joint (pivoting around the distal condyles)
     this.patellaGroup = new THREE.Group();
+    this.patellaGroup.position.set(0, Y_OFF, 0);
     const patellaMesh = new THREE.Mesh(new THREE.SphereGeometry(0.22, 18, 16), boneMat);
     patellaMesh.scale.set(0.55, 1.05, 0.95);
     patellaMesh.position.set(0.42, 0.16, 0);
@@ -397,12 +421,12 @@ class DualIMUJoint3D {
 
     // --- Seeed XIAO 1.14" IPS Display Module Strapped to Mid-Femur (matching Photo 2) ---
     const xiaoMount = new THREE.Group();
-    xiaoMount.position.set(0.06, 1.85, 0.42); // Lateral-anterior mid-femur shaft
+    xiaoMount.position.set(0.06, 1.85 + Y_OFF, 0.42); // Lateral-anterior mid-femur shaft
     this.proximalGroup.add(xiaoMount);
 
     // Black Velcro Strap wrapping the Femur shaft
     const femurStrap = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.30, 0.55, 24), strapMat);
-    femurStrap.position.set(-0.06, 1.85, 0);
+    femurStrap.position.set(-0.06, 1.85 + Y_OFF, 0);
     this.proximalGroup.add(femurStrap);
 
     // Black Enclosure Base & LiPo Battery under XIAO Display
@@ -443,7 +467,7 @@ class DualIMUJoint3D {
 
     // --- Sensor #1 (0x69) Adafruit ICM-20948 on Distal Lateral Femur (matching Photo 1 & 2) ---
     const s1Pod = this.createICM20948BreakoutMesh(false);
-    s1Pod.position.set(0.0, 0.72, 0.50); // Distal lateral femur above knee joint
+    s1Pod.position.set(0.0, 0.72 + Y_OFF, 0.50); // Distal lateral femur above knee joint
     this.proximalGroup.add(s1Pod);
 
     this.s1TopAnchor = new THREE.Object3D();
@@ -587,15 +611,16 @@ class DualIMUJoint3D {
   updateCableCurve() {
     if (!this.s1BotAnchor || !this.s2TopAnchor || !this.cableGeometry) return;
 
+    const bowUp = new THREE.Vector3(-0.08, 0, 0.14).applyQuaternion(this.q1Smooth);
+    const bowLow = new THREE.Vector3(-0.06, 0, 0.18).applyQuaternion(this.q1Smooth);
+
     // 1. Upper cable (XIAO Display -> S1 top connector)
     if (this.xiaoAnchor && this.s1TopAnchor && this.upperCableGeo) {
       const p0 = new THREE.Vector3();
       const p1 = new THREE.Vector3();
       this.xiaoAnchor.getWorldPosition(p0);
       this.s1TopAnchor.getWorldPosition(p1);
-      const mid = p0.clone().add(p1).multiplyScalar(0.5);
-      mid.z += 0.14;
-      mid.x -= 0.08;
+      const mid = p0.clone().add(p1).multiplyScalar(0.5).add(bowUp);
       const curveUp = new THREE.QuadraticBezierCurve3(p0, mid, p1);
       this.upperCableGeo.setFromPoints(curveUp.getPoints(12));
     }
@@ -606,9 +631,7 @@ class DualIMUJoint3D {
     this.s1BotAnchor.getWorldPosition(pStart);
     this.s2TopAnchor.getWorldPosition(pEnd);
 
-    const pMid = pStart.clone().add(pEnd).multiplyScalar(0.5);
-    pMid.z += 0.18; // bows slightly outward laterally across the knee condyle
-    pMid.x -= 0.06;
+    const pMid = pStart.clone().add(pEnd).multiplyScalar(0.5).add(bowLow);
 
     const curve = new THREE.QuadraticBezierCurve3(pStart, pMid, pEnd);
     const pts = curve.getPoints(24);
@@ -631,23 +654,84 @@ class DualIMUJoint3D {
    * Updates the 3D articulated joint model from real-time dual-IMU telemetry.
    *
    * In standing calibration (0°, 0°, 0°):
-   *   - Femur (proximalGroup) is upright along +Y.
-   *   - Tibia & Foot (distalGroup) extend vertically down along -Y.
-   *   - Flexion (+fe) swings the lower leg (Tibia & Foot) posteriorly (-X) in the sagittal plane,
-   *     matching an athlete flexing their knee in standing posture.
-   *   - Varus/Valgus (ru) abducts/adducts the tibia in the frontal (Y-Z) plane.
-   *   - Internal/External Rotation (ps) twists the tibia axially around its longitudinal Y shaft.
+   *   - Femur (proximalGroup) pivots around the upper thigh / hip at world (0, 1.55, 0) and
+   *     dynamically repositions in 3D as Sensor #1 (0x69) changes orientation during movement,
+   *     carrying the knee joint (jointPivot), tibia, fibula, foot, and protractor rings.
+   *   - Tibia & Foot (distalGroup) articulate at the knee joint (jointPivot) relative to the femur:
+   *     * Flexion (+fe) swings the lower leg posteriorly (-X) in the femur's sagittal plane.
+   *     * Varus/Valgus (ru) abducts/adducts the tibia in the femur's frontal (Y-Z) plane.
+   *     * Internal/External Rotation (ps) twists the tibia axially around its longitudinal Y shaft.
    */
   updateKinematics(s1, s2, flexExtDeg, radUlnDeg, proSupDeg, battPct = 95, jointName = 'KNEE', isCal = true) {
     this.jointPreset = String(jointName || 'KNEE').toUpperCase();
     this.currentFeDeg = flexExtDeg;
 
-    // Keep proximal femur steady in the standing anatomical reference frame (with subtle thigh sway if uncalibrated)
-    const qProxTarget = new THREE.Quaternion();
-    this.q1Smooth.slerp(qProxTarget, 0.25);
+    const nowMs = performance.now();
+    const dt = Math.max(0.002, Math.min(0.15, (nowMs - (this.lastKinematicsTime || nowMs)) / 1000));
+    this.lastKinematicsTime = nowMs;
 
-    // Map anatomical 3D angles to distal Tibia / Hand segment:
-    // Knee Flexion swings the lower leg backward (-X), which is a negative Z rotation in right-handed (X=Anterior, Y=Up, Z=Lateral)
+    // 1. Compute Real-Time 3D Femur Orientation from Sensor #1 (0x69)
+    let qProxTarget = new THREE.Quaternion();
+    if (s1 && typeof s1.ax === 'number' && typeof s1.ay === 'number' && typeof s1.az === 'number') {
+      const a1Mag = Math.hypot(s1.ax, s1.ay, s1.az);
+      if (a1Mag > 1.5) {
+        const g_s1 = new THREE.Vector3(s1.ax / a1Mag, s1.ay / a1Mag, s1.az / a1Mag);
+        this.s1LocalCurrent.copy(g_s1);
+
+        // Map Sensor #1 PCB frame (X=shaft, Y=sagittal AP, Z=lateral outward) to Three.js anatomical frame
+        this.s1GravCurrent.set(g_s1.y, -g_s1.x, g_s1.z).normalize();
+
+        if (!this.hasTaredS1) {
+          this.s1LocalTare.copy(g_s1);
+          this.s1GravTare.copy(this.s1GravCurrent);
+          this.s1TableYaw = 0;
+          this.hasTaredS1 = true;
+        }
+
+        // Shortest-arc rotation in Sensor #1's local frame from current gravity vector to tared gravity vector
+        const qLocalDelta = new THREE.Quaternion().setFromUnitVectors(g_s1, this.s1LocalTare);
+        const eLocal = new THREE.Euler().setFromQuaternion(qLocalDelta, 'ZYX');
+
+        // Integrate table yaw when board is flat on a bench/table (|az1| > 8.5 m/s^2)
+        if (Math.abs(s1.az) > 8.5) {
+          const gz1 = typeof s1.gz === 'number' ? s1.gz : 0;
+          if (Math.abs(gz1) > 0.8) {
+            this.s1TableYaw = THREE.MathUtils.clamp(this.s1TableYaw + gz1 * dt, -90, 90);
+          }
+        }
+
+        let femurPitchRad = 0;
+        let femurRollRad = 0;
+        if (Math.abs(this.s1LocalTare.z) <= 0.75) {
+          // Lateral femur mounting: Z_sensor is lateral flexion hinge (+Z), Y_sensor is sagittal AP (+X)
+          femurPitchRad = eLocal.z;
+          femurRollRad = Math.asin(THREE.MathUtils.clamp(this.s1LocalTare.z, -1, 1)) -
+            Math.asin(THREE.MathUtils.clamp(g_s1.z, -1, 1));
+        } else {
+          // Flat table / bench or demo mode mounting where Z_sensor faces vertically at tare
+          femurPitchRad = eLocal.y + eLocal.z + THREE.MathUtils.degToRad(this.s1TableYaw);
+          femurRollRad = eLocal.x;
+        }
+
+        const clampedPitchDeg = THREE.MathUtils.clamp(THREE.MathUtils.radToDeg(femurPitchRad), -85, 110);
+        const clampedRollDeg = THREE.MathUtils.clamp(THREE.MathUtils.radToDeg(femurRollRad), -45, 45);
+        this.currentFemurPitchDeg = clampedPitchDeg;
+        this.currentFemurRollDeg = clampedRollDeg;
+
+        const proxEuler = new THREE.Euler(
+          THREE.MathUtils.degToRad(clampedRollDeg),
+          0,
+          THREE.MathUtils.degToRad(clampedPitchDeg),
+          'ZXY'
+        );
+        qProxTarget.setFromEuler(proxEuler);
+        this.q1Raw.copy(qProxTarget);
+      }
+    }
+    this.q1Smooth.slerp(qProxTarget, 0.28);
+
+    // 2. Map anatomical 3D relative angles to distal Tibia / Hand segment:
+    // Knee Flexion swings the lower leg backward (-X) relative to the femur, which is -Z rotation
     const feAbsOrSigned = this.jointPreset === 'KNEE' ? Math.abs(flexExtDeg) : flexExtDeg;
     const feRad = THREE.MathUtils.degToRad(feAbsOrSigned);
     const vvRad = THREE.MathUtils.degToRad(radUlnDeg);
@@ -660,7 +744,6 @@ class DualIMUJoint3D {
 
     // Update Patella tracking (patella glides slightly inferiorly along the condyles during knee flexion)
     if (this.patellaGroup) {
-      const glide = Math.min(1.0, Math.abs(flexExtDeg) / 110.0);
       this.patellaGroup.rotation.z = -feRad * 0.38;
     }
 
@@ -681,6 +764,30 @@ class DualIMUJoint3D {
 
   tare() {
     this.q1Tare.copy(this.q1Raw);
+    if (this.s1LocalCurrent && this.s1LocalCurrent.lengthSq() > 0.1) {
+      this.s1LocalTare.copy(this.s1LocalCurrent);
+      this.s1GravTare.copy(this.s1GravCurrent);
+      this.hasTaredS1 = true;
+    } else {
+      this.hasTaredS1 = false;
+    }
+    this.s1TableYaw = 0;
+    this.currentFemurPitchDeg = 0;
+    this.currentFemurRollDeg = 0;
+  }
+
+  /**
+   * Renders one frame and returns a PNG data URL snapshot of the 3D anatomical canvas
+   * for graphical biomechanical analysis reports.
+   */
+  captureSnapshotDataURL() {
+    if (!this.renderer || !this.scene || !this.camera) return null;
+    if (this.proximalGroup) this.proximalGroup.quaternion.copy(this.q1Smooth);
+    if (this.distalGroup) this.distalGroup.quaternion.copy(this.q2Smooth);
+    this.updateCableCurve();
+    if (this.controls) this.controls.update();
+    this.renderer.render(this.scene, this.camera);
+    return this.renderer.domElement.toDataURL('image/png');
   }
 
   resetView() {

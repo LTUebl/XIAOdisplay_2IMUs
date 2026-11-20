@@ -36,6 +36,7 @@
   --plane-ru: #10b981;   /* Varus / Valgus or Ab/Adduction (Frontal) */
   --plane-ps: #f59e0b;   /* Int / Ext Axial Rotation (Transverse) */
   --plane-tot: #8b5cf6;  /* Total 3D Excursion */
+  --plane-femur: #ec4899;/* Proximal Femur Sagittal Inclination (S1 0x69) */
 
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 10px -2px rgb(15 23 42 / 0.08), 0 2px 4px -2px rgb(15 23 42 / 0.05);
@@ -348,16 +349,38 @@ body {
 
 .primary-actions-grid {
   display: grid;
-  grid-template-columns: 1.8fr 1.2fr 0.7fr 1.1fr;
-  gap: 0.65rem;
+  grid-template-columns: 1.55fr 1fr 0.55fr 1.35fr 1.2fr 0.95fr;
+  gap: 0.55rem;
 }
 
 .btn-action-big {
-  min-height: 48px;
-  font-size: 0.9rem;
-  padding: 0.65rem 1rem;
+  min-height: 46px;
+  font-size: 0.84rem;
+  padding: 0.55rem 0.85rem;
   border-radius: var(--radius-md);
   font-weight: 800;
+}
+
+.btn-report {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+  border-color: #1e3a8a;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(29, 78, 216, 0.22);
+}
+.btn-report:hover {
+  background: #1e3a8a;
+  color: #ffffff;
+}
+
+.btn-png {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  border-color: #5b21b6;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(124, 58, 237, 0.22);
+}
+.btn-png:hover {
+  background: #5b21b6;
+  color: #ffffff;
 }
 
 .btn-export {
@@ -506,13 +529,33 @@ body {
 .color-ru { color: var(--plane-ru); }
 .color-ps { color: var(--plane-ps); }
 .color-tot { color: var(--plane-tot); }
+.color-femur { color: var(--plane-femur); }
 
 /* Main 2-Column Workspace */
 .app-container {
   display: grid;
-  grid-template-columns: 1.08fr 1.15fr;
+  grid-template-columns: 1.05fr 1.18fr;
   gap: 0.9rem;
   padding: 0.45rem 1.1rem 0.9rem;
+  align-items: start;
+}
+
+.panel-3d-sticky {
+  position: sticky;
+  top: 70px;
+}
+
+.right-column-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+.panel-subtitle {
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  margin-top: 2px;
 }
 
 .panel {
@@ -602,6 +645,14 @@ body {
   font-size: 0.71rem;
   font-weight: 600;
   backdrop-filter: blur(4px);
+}
+
+.hud-pill-replay {
+  background: rgba(124, 58, 237, 0.92);
+  color: #ffffff;
+  border-color: #c4b5fd;
+  font-weight: 800;
+  box-shadow: 0 2px 10px rgba(124, 58, 237, 0.45);
 }
 
 /* Virtual XIAO 1.14" Landscape IPS Display Mirror & Hardware Control Deck */
@@ -790,6 +841,225 @@ body {
   font-weight: 600;
 }
 
+/* Recorded Trials Review, 3D Playback & Graphical Analysis Panel */
+.trial-review-panel {
+  border-top: 3px solid #2563eb;
+}
+
+.trial-selector-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.trial-select-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.trial-select {
+  flex: 1;
+  min-width: 220px;
+  min-height: 38px;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid #cbd5e1;
+  background: var(--bg-subtle);
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.trial-playback-box {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.trial-playback-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.speed-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.22rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  padding: 0.16rem 0.35rem;
+  border-radius: 6px;
+}
+
+.speed-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-right: 0.15rem;
+}
+
+.speed-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.18rem 0.42rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.speed-btn.active {
+  background: var(--accent-primary);
+  color: #ffffff;
+}
+
+.trial-time-pill {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: #1e293b;
+  background: #e2e8f0;
+  padding: 0.22rem 0.55rem;
+  border-radius: 6px;
+}
+
+.trial-scrubber-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.trial-scrubber {
+  width: 100%;
+  accent-color: #2563eb;
+  height: 7px;
+  cursor: pointer;
+}
+
+.trial-instant-badges {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.instant-chip {
+  font-size: 0.73rem;
+  font-weight: 600;
+  padding: 0.2rem 0.52rem;
+  border-radius: 6px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.instant-chip strong {
+  color: var(--text-main);
+}
+.instant-chip.chip-fe strong { color: var(--plane-fe); }
+.instant-chip.chip-ru strong { color: var(--plane-ru); }
+.instant-chip.chip-ps strong { color: var(--plane-ps); }
+.instant-chip.chip-femur strong { color: var(--plane-femur); }
+
+.trial-chart-container {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.trial-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.trial-chart-title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.trial-chart-hint {
+  font-size: 0.7rem;
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+.trial-canvas-wrap {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+#trial-review-chart {
+  display: block;
+  width: 100%;
+  height: 220px;
+  cursor: crosshair;
+}
+
+.trial-stats-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.tstat-card {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.48rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+}
+
+.tstat-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.tstat-card strong {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.tstat-sub {
+  font-family: var(--font-mono);
+  font-size: 0.67rem;
+  color: var(--text-muted);
+}
+
+.trial-export-actions {
+  display: grid;
+  grid-template-columns: 1.3fr 1.15fr 0.95fr;
+  gap: 0.5rem;
+}
+
 /* Collapsible Bottom Diagnostics Section */
 .bottom-section {
   padding: 0 1.1rem 1.5rem;
@@ -960,9 +1230,18 @@ body {
 }
 
 /* Mobile & iPhone Responsive Optimizations */
+@media (max-width: 1200px) {
+  .primary-actions-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 1120px) {
   .app-container {
     grid-template-columns: 1fr;
+  }
+  .panel-3d-sticky {
+    position: static;
   }
   .diagnostics-grid {
     grid-template-columns: 1fr;
@@ -984,6 +1263,12 @@ body {
     font-size: 1.95rem;
   }
   .xiao-deck {
+    grid-template-columns: 1fr;
+  }
+  .trial-stats-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .trial-export-actions {
     grid-template-columns: 1fr;
   }
 }

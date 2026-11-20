@@ -57,7 +57,7 @@
       <button id="btn-connect-usb" class="btn btn-secondary-usb" title="Connect via USB-C Web Serial (115200 baud)">
         Connect USB
       </button>
-      <button id="btn-demo-mode" class="btn btn-demo" title="Run interactive 3D Knee Flexion/Extension simulation">
+      <button id="btn-demo-mode" class="btn btn-demo" title="Run interactive 3D Compound Femur + Tibia Knee Flexion/Extension simulation">
         3D Demo
       </button>
       <a href="./iphone.html" class="btn btn-sm" style="text-decoration:none; background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc; font-weight:800; padding:0.42rem 0.7rem; border-radius:9px;" title="Open dedicated single-screen iPhone Direct Bluetooth controller">
@@ -90,8 +90,16 @@
         Reset
       </button>
 
-      <button id="btn-export-csv" class="btn btn-action-big btn-export" disabled title="Share via iPhone AirDrop/Files or download CSV">
-        Export / Share CSV
+      <button id="btn-export-report" class="btn btn-action-big btn-report" title="Generate &amp; open/download self-contained LTU EBL Graphical Kinematic Analysis Report (PDF / HTML)">
+        &#x1F4CA; Export Graphical Report (PDF / HTML)
+      </button>
+
+      <button id="btn-export-png" class="btn btn-action-big btn-png" title="Render &amp; save high-resolution 1400x1650 Graphical Analysis Poster (.PNG)">
+        &#x1F5BC;&#xFE0F; Save Graphical Analysis PNG
+      </button>
+
+      <button id="btn-export-csv" class="btn btn-action-big btn-export" title="Share via iPhone AirDrop/Files or download Raw Data (.CSV)">
+        &#x1F4C4; Export Raw Data (.CSV)
       </button>
     </div>
 
@@ -104,6 +112,10 @@
       <div class="telemetry-chip">
         <span class="chip-label">Time:</span>
         <strong id="val-time">0.00</strong><span class="chip-unit">s</span>
+      </div>
+      <div class="telemetry-chip">
+        <span class="chip-label">Femur Tilt (S1):</span>
+        <strong id="val-femur-pitch" class="color-femur">0.0</strong><span class="chip-unit">&deg;</span>
       </div>
       <div class="telemetry-chip">
         <span class="chip-label">Total 3D:</span>
@@ -205,8 +217,8 @@
   <!-- Main Responsive 2-Column Workspace (Stacks cleanly on iPhone) -->
   <main class="app-container">
 
-    <!-- Left Column: 3D Anatomical Joint Viewer Card -->
-    <section class="panel">
+    <!-- Left Column: 3D Anatomical Joint Viewer Card (Sticky on Desktop during Trial Playback) -->
+    <section class="panel panel-3d-sticky">
       <div class="panel-header">
         <h2>
           3D Anatomical Joint Viewer (<span id="lbl-3d-segments">Thigh S1 [0x69] &rarr; Lower Leg S2 [0x68]</span>)
@@ -224,6 +236,9 @@
           <div class="canvas-hud-top">
             <div class="hud-pill">
               Sleeve Display: Anterior Thigh &bull; S1 (0x69): Lateral Thigh &bull; S2 (0x68): Lateral Shank
+            </div>
+            <div id="hud-replay-pill" class="hud-pill hud-pill-replay" style="display:none;">
+              &#x25B6; 3D TRIAL REPLAY ACTIVE
             </div>
           </div>
         </div>
@@ -278,83 +293,197 @@
       </div>
     </section>
 
-    <!-- Right Column: Real-Time Multi-Axis Chart & Range of Motion (ROM) Summary Table -->
-    <section class="panel">
-      <div class="panel-header">
-        <h2>Real-Time Multi-Axis Chart &amp; ROM Summary</h2>
-        <div class="chart-controls">
-          <button class="tab-btn active" data-tab="angles">3D Angles (&deg;)</button>
-          <button class="tab-btn" data-tab="gyro">Ang Vel (&deg;/s)</button>
-          <button class="tab-btn" data-tab="accel">Accel (m/s&sup2;)</button>
-          <span class="chart-divider">|</span>
-          <button class="tab-btn" data-window="5">5s</button>
-          <button class="tab-btn active" data-window="10">10s</button>
-          <button class="tab-btn" data-window="30">30s</button>
-          <button id="btn-pause-chart" class="btn btn-sm">Pause</button>
-        </div>
-      </div>
-
-      <div class="panel-body">
-        <div class="chart-wrapper">
-          <canvas id="live-chart"></canvas>
+    <!-- Right Column: Real-Time Multi-Axis Chart, ROM Summary & Recorded Trials Review / Graphical Analysis -->
+    <div class="right-column-stack">
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Real-Time Multi-Axis Chart &amp; ROM Summary</h2>
+          <div class="chart-controls">
+            <button class="tab-btn active" data-tab="angles">3D Angles (&deg;)</button>
+            <button class="tab-btn" data-tab="gyro">Ang Vel (&deg;/s)</button>
+            <button class="tab-btn" data-tab="accel">Accel (m/s&sup2;)</button>
+            <span class="chart-divider">|</span>
+            <button class="tab-btn" data-window="5">5s</button>
+            <button class="tab-btn active" data-window="10">10s</button>
+            <button class="tab-btn" data-window="30">30s</button>
+            <button id="btn-pause-chart" class="btn btn-sm">Pause</button>
+          </div>
         </div>
 
-        <!-- Range of Motion (ROM) Summary Table -->
-        <div class="analytics-box">
-          <div class="analytics-header">
-            <h3>Range of Motion (ROM) Summary</h3>
-            <div style="display:flex; gap:0.5rem; align-items:center;">
-              <span id="rep-counter-badge" class="badge badge-accent">Reps: 0</span>
-              <button id="btn-reset-rom" class="btn btn-sm">Reset ROM</button>
+        <div class="panel-body">
+          <div class="chart-wrapper">
+            <canvas id="live-chart"></canvas>
+          </div>
+
+          <!-- Range of Motion (ROM) Summary Table -->
+          <div class="analytics-box">
+            <div class="analytics-header">
+              <h3>Range of Motion (ROM) Summary</h3>
+              <div style="display:flex; gap:0.5rem; align-items:center;">
+                <span id="rep-counter-badge" class="badge badge-accent">Reps: 0</span>
+                <button id="btn-reset-rom" class="btn btn-sm">Reset ROM</button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="analytics-table">
+                <thead>
+                  <tr>
+                    <th>Joint Axis</th>
+                    <th>Now (&deg;)</th>
+                    <th>Min (&deg;)</th>
+                    <th>Max (&deg;)</th>
+                    <th>ROM Span (&deg;)</th>
+                    <th>Mean (&deg;)</th>
+                    <th>Peak (&deg;/s)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td id="rom-name-p1" style="color:var(--plane-fe); font-weight:700;">Flex / Ext</td>
+                    <td id="rom-cur-fe">0.0</td>
+                    <td id="rom-min-fe">0.0</td>
+                    <td id="rom-max-fe">0.0</td>
+                    <td id="rom-span-fe" style="font-weight:700;">0.0</td>
+                    <td id="rom-mean-fe">0.0</td>
+                    <td id="rom-pkv-fe">0.0</td>
+                  </tr>
+                  <tr>
+                    <td id="rom-name-p2" style="color:var(--plane-ru); font-weight:700;">Varus / Valgus</td>
+                    <td id="rom-cur-ru">0.0</td>
+                    <td id="rom-min-ru">0.0</td>
+                    <td id="rom-max-ru">0.0</td>
+                    <td id="rom-span-ru" style="font-weight:700;">0.0</td>
+                    <td id="rom-mean-ru">0.0</td>
+                    <td id="rom-pkv-ru">0.0</td>
+                  </tr>
+                  <tr>
+                    <td id="rom-name-p3" style="color:var(--plane-ps); font-weight:700;">Int / Ext Rot</td>
+                    <td id="rom-cur-ps">0.0</td>
+                    <td id="rom-min-ps">0.0</td>
+                    <td id="rom-max-ps">0.0</td>
+                    <td id="rom-span-ps" style="font-weight:700;">0.0</td>
+                    <td id="rom-mean-ps">0.0</td>
+                    <td id="rom-pkv-ps">0.0</td>
+                  </tr>
+                  <tr>
+                    <td id="rom-name-femur" style="color:var(--plane-femur); font-weight:700;">Femur Tilt (S1)</td>
+                    <td id="rom-cur-femur">0.0</td>
+                    <td id="rom-min-femur">0.0</td>
+                    <td id="rom-max-femur">0.0</td>
+                    <td id="rom-span-femur" style="font-weight:700;">0.0</td>
+                    <td id="rom-mean-femur">0.0</td>
+                    <td id="rom-pkv-femur">0.0</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
-          <div class="table-responsive">
-            <table class="analytics-table">
-              <thead>
-                <tr>
-                  <th>Joint Axis</th>
-                  <th>Now (&deg;)</th>
-                  <th>Min (&deg;)</th>
-                  <th>Max (&deg;)</th>
-                  <th>ROM Span (&deg;)</th>
-                  <th>Mean (&deg;)</th>
-                  <th>Peak (&deg;/s)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td id="rom-name-p1" style="color:var(--plane-fe); font-weight:700;">Flex / Ext</td>
-                  <td id="rom-cur-fe">0.0</td>
-                  <td id="rom-min-fe">0.0</td>
-                  <td id="rom-max-fe">0.0</td>
-                  <td id="rom-span-fe" style="font-weight:700;">0.0</td>
-                  <td id="rom-mean-fe">0.0</td>
-                  <td id="rom-pkv-fe">0.0</td>
-                </tr>
-                <tr>
-                  <td id="rom-name-p2" style="color:var(--plane-ru); font-weight:700;">Varus / Valgus</td>
-                  <td id="rom-cur-ru">0.0</td>
-                  <td id="rom-min-ru">0.0</td>
-                  <td id="rom-max-ru">0.0</td>
-                  <td id="rom-span-ru" style="font-weight:700;">0.0</td>
-                  <td id="rom-mean-ru">0.0</td>
-                  <td id="rom-pkv-ru">0.0</td>
-                </tr>
-                <tr>
-                  <td id="rom-name-p3" style="color:var(--plane-ps); font-weight:700;">Int / Ext Rot</td>
-                  <td id="rom-cur-ps">0.0</td>
-                  <td id="rom-min-ps">0.0</td>
-                  <td id="rom-max-ps">0.0</td>
-                  <td id="rom-span-ps" style="font-weight:700;">0.0</td>
-                  <td id="rom-mean-ps">0.0</td>
-                  <td id="rom-pkv-ps">0.0</td>
-                </tr>
-              </tbody>
-            </table>
+        </div>
+      </section>
+
+      <!-- Recorded Trials Review, 3D Playback & Graphical Analysis Panel -->
+      <section class="panel trial-review-panel" id="trial-review-section">
+        <div class="panel-header">
+          <div>
+            <h2>Recorded Trials Review, 3D Playback &amp; Graphical Analysis</h2>
+            <p class="panel-subtitle">Auto-saves every recorded session &amp; memory dump &bull; Replay in 3D or export publication-grade reports</p>
+          </div>
+          <span id="trial-count-badge" class="badge badge-accent">1 Saved Trial</span>
+        </div>
+
+        <div class="panel-body">
+          <!-- Trial Selector Row -->
+          <div class="trial-selector-row">
+            <label for="trial-select" class="trial-select-label">Trial:</label>
+            <select id="trial-select" class="trial-select" title="Select a recorded trial to review, replay in 3D, or export">
+            </select>
+            <button id="btn-trial-delete" class="btn btn-sm" title="Remove selected trial from history">
+              Delete
+            </button>
+          </div>
+
+          <!-- 3D Trial Playback Controls & Interactive Time Scrubber -->
+          <div class="trial-playback-box">
+            <div class="trial-playback-controls">
+              <button id="btn-trial-play" class="btn btn-sm btn-primary" title="Replay recorded trial on the 3D Femur &amp; Tibia model">
+                &#x25B6; Replay Trial in 3D
+              </button>
+              <button id="btn-trial-stop" class="btn btn-sm" title="Stop 3D trial replay and return to live stream">
+                &#x23F9; Live Mode
+              </button>
+              <div class="speed-group" role="group" aria-label="Playback Speed">
+                <span class="speed-label">Speed:</span>
+                <button type="button" class="speed-btn" data-speed="0.5">0.5x</button>
+                <button type="button" class="speed-btn active" data-speed="1">1x</button>
+                <button type="button" class="speed-btn" data-speed="2">2x</button>
+              </div>
+              <span id="trial-scrub-time" class="trial-time-pill">t = 0.00s / 0.00s</span>
+            </div>
+
+            <div class="trial-scrubber-row">
+              <input id="trial-scrubber" type="range" min="0" max="100" value="0" step="1" class="trial-scrubber" title="Drag to scrub through the recorded trial in 3D">
+            </div>
+
+            <!-- Live Scrubber Instantaneous Angle Readout Badges -->
+            <div class="trial-instant-badges">
+              <span class="instant-chip chip-fe">Flex/Ext: <strong id="scrub-val-fe">0.0&deg;</strong></span>
+              <span class="instant-chip chip-ru">Var/Val: <strong id="scrub-val-ru">0.0&deg;</strong></span>
+              <span class="instant-chip chip-ps">Int/Ext: <strong id="scrub-val-ps">0.0&deg;</strong></span>
+              <span class="instant-chip chip-femur">Femur Tilt: <strong id="scrub-val-femur">0.0&deg;</strong></span>
+              <span class="instant-chip">Ang Vel: <strong id="scrub-val-vel">0.0&deg;/s</strong></span>
+            </div>
+          </div>
+
+          <!-- High-DPI Trial Graphical Analysis Canvas (Multi-Axis Time Series + Peak Callouts) -->
+          <div class="trial-chart-container">
+            <div class="trial-chart-header">
+              <span id="trial-chart-title" class="trial-chart-title">Trial Multi-Axis Kinematics &amp; Peak ROM Profile</span>
+              <span class="trial-chart-hint">Click or drag on graph to scrub 3D model</span>
+            </div>
+            <div class="trial-canvas-wrap">
+              <canvas id="trial-review-chart" width="920" height="270"></canvas>
+            </div>
+          </div>
+
+          <!-- Selected Trial Quick Stats Strip -->
+          <div id="trial-stats-strip" class="trial-stats-strip">
+            <div class="tstat-card">
+              <span class="tstat-label">Flex/Ext ROM</span>
+              <strong id="tstat-fe-rom" class="color-fe">0.0&deg;</strong>
+              <span id="tstat-fe-minmax" class="tstat-sub">Min 0.0&deg; / Max 0.0&deg;</span>
+            </div>
+            <div class="tstat-card">
+              <span class="tstat-label">Varus/Valgus ROM</span>
+              <strong id="tstat-ru-rom" class="color-ru">0.0&deg;</strong>
+              <span id="tstat-ru-minmax" class="tstat-sub">Min 0.0&deg; / Max 0.0&deg;</span>
+            </div>
+            <div class="tstat-card">
+              <span class="tstat-label">Int/Ext Rot ROM</span>
+              <strong id="tstat-ps-rom" class="color-ps">0.0&deg;</strong>
+              <span id="tstat-ps-minmax" class="tstat-sub">Min 0.0&deg; / Max 0.0&deg;</span>
+            </div>
+            <div class="tstat-card">
+              <span class="tstat-label">Femur Sagittal Tilt</span>
+              <strong id="tstat-femur-rom" class="color-femur">0.0&deg;</strong>
+              <span id="tstat-femur-minmax" class="tstat-sub">Min 0.0&deg; / Max 0.0&deg;</span>
+            </div>
+          </div>
+
+          <!-- Prominent Graphical Analysis Report & Raw Data Export Buttons -->
+          <div class="trial-export-actions">
+            <button id="btn-trial-export-report" class="btn btn-report">
+              &#x1F4CA; Export Graphical Report (PDF / HTML)
+            </button>
+            <button id="btn-trial-export-png" class="btn btn-png">
+              &#x1F5BC;&#xFE0F; Save Graphical Analysis PNG
+            </button>
+            <button id="btn-trial-export-csv" class="btn btn-export">
+              &#x1F4C4; Export Raw Data (.CSV)
+            </button>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
 
   </main>
 
@@ -382,9 +511,9 @@
                     <th>Flx/Ext (&deg;)</th>
                     <th>Var/Val (&deg;)</th>
                     <th>Int/Ext (&deg;)</th>
+                    <th>Femur (&deg;)</th>
                     <th>S1 |A|</th>
                     <th>S2 |A|</th>
-                    <th>S1 |G|</th>
                     <th>S2 |G|</th>
                   </tr>
                 </thead>

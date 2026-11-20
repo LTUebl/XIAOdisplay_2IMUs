@@ -568,6 +568,191 @@
       position: relative;
     }
 
+    /* Recorded Trials Review, 3D Replay & Graphical Analysis Report Card */
+    .trials-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 0.65rem 0.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .trials-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.45rem;
+    }
+
+    .trials-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      min-width: 0;
+    }
+
+    .trials-title {
+      font-size: 0.76rem;
+      font-weight: 800;
+      color: var(--text-main);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .trials-count-badge {
+      background: rgba(56, 189, 248, 0.16);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 999px;
+      padding: 0.12rem 0.45rem;
+      font-size: 0.65rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .trials-select-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.4rem;
+      align-items: center;
+    }
+
+    .trial-select {
+      width: 100%;
+      background: var(--bg-card-alt);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 0.45rem 0.55rem;
+      font-size: 0.76rem;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .btn-trial-replay {
+      min-height: 38px;
+      padding: 0 0.75rem;
+      background: linear-gradient(135deg, #7c3aed, #6d28d9);
+      color: #ffffff;
+      font-size: 0.76rem;
+      border-radius: 10px;
+      white-space: nowrap;
+      box-shadow: 0 3px 10px rgba(124, 58, 237, 0.32);
+    }
+
+    .btn-trial-replay.replaying {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      box-shadow: 0 3px 10px rgba(220, 38, 38, 0.35);
+    }
+
+    .scrubber-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 0.35rem 0.55rem;
+    }
+
+    .scrub-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      white-space: nowrap;
+      min-width: 78px;
+    }
+
+    .trial-scrubber {
+      flex: 1;
+      accent-color: #38bdf8;
+      height: 6px;
+      cursor: pointer;
+    }
+
+    .scrub-pose-badge {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      color: #38bdf8;
+      white-space: nowrap;
+      font-weight: 700;
+    }
+
+    .trial-canvas-wrap {
+      background: #080d19;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 0.3rem;
+      position: relative;
+    }
+
+    #ip-trial-canvas {
+      width: 100%;
+      height: 125px;
+      display: block;
+      cursor: ew-resize;
+    }
+
+    .trial-stats-mini {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.35rem;
+      text-align: center;
+    }
+
+    .trial-stat-pill {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 0.28rem 0.3rem;
+    }
+
+    .trial-stat-pill .lbl {
+      font-size: 0.58rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .trial-stat-pill .val {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 800;
+      margin-top: 1px;
+    }
+
+    .report-export-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.45rem;
+    }
+
+    .btn-report-html {
+      min-height: 44px;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
+      font-size: 0.76rem;
+      padding: 0 0.55rem;
+      border-radius: 11px;
+      box-shadow: 0 3px 10px rgba(37, 99, 235, 0.28);
+    }
+
+    .btn-report-png {
+      min-height: 44px;
+      background: linear-gradient(135deg, #0d9488, #0f766e);
+      color: #ffffff;
+      font-size: 0.76rem;
+      padding: 0 0.55rem;
+      border-radius: 11px;
+      box-shadow: 0 3px 10px rgba(13, 148, 136, 0.28);
+    }
+
     /* Modal Help Overlay */
     .modal-backdrop {
       position: fixed;
@@ -803,6 +988,66 @@
       </div>
     </section>
 
+    <!-- Recorded Trials Review, 3D Replay & Graphical Analysis Report Card -->
+    <section class="trials-card">
+      <div class="trials-header">
+        <div class="trials-title-wrap">
+          <span class="trials-title">Recorded Trials Review &amp; Graphical Report</span>
+        </div>
+        <span id="ip-trials-badge" class="trials-count-badge">1 Trial</span>
+      </div>
+
+      <!-- Trial Selector Dropdown + 3D Replay / Live Button -->
+      <div class="trials-select-row">
+        <select id="ip-trial-select" class="trial-select" aria-label="Select Recorded Trial"></select>
+        <button id="btn-ip-replay" class="btn btn-trial-replay" title="Replay Selected Trial on 3D Femur &amp; Tibia Model">
+          ▶ Replay in 3D
+        </button>
+      </div>
+
+      <!-- Interactive 3D Time Scrubber Slider -->
+      <div class="scrubber-row">
+        <span id="ip-scrub-time" class="scrub-label">0.00 / 0.00s</span>
+        <input id="ip-trial-scrub" type="range" class="trial-scrubber" min="0" max="100" value="0" aria-label="Trial Time Scrubber">
+        <span id="ip-scrub-pose" class="scrub-pose-badge">Flx 0.0&deg; | Fem 0.0&deg;</span>
+      </div>
+
+      <!-- Multi-Axis Trial Overview Canvas (Flex/Ext, Var/Val, Int/Ext, Femur Tilt) -->
+      <div class="trial-canvas-wrap">
+        <canvas id="ip-trial-canvas"></canvas>
+      </div>
+
+      <!-- Selected Trial ROM & Femur Tilt Summary Strip -->
+      <div class="trial-stats-mini">
+        <div class="trial-stat-pill">
+          <div class="lbl">Flex/Ext ROM</div>
+          <div id="ip-stat-fe" class="val" style="color:var(--accent-fe);">0.0&deg;</div>
+        </div>
+        <div class="trial-stat-pill">
+          <div class="lbl">Var/Val ROM</div>
+          <div id="ip-stat-ru" class="val" style="color:var(--accent-ru);">0.0&deg;</div>
+        </div>
+        <div class="trial-stat-pill">
+          <div class="lbl">Int/Ext ROM</div>
+          <div id="ip-stat-ps" class="val" style="color:var(--accent-ps);">0.0&deg;</div>
+        </div>
+        <div class="trial-stat-pill">
+          <div class="lbl">Femur Tilt</div>
+          <div id="ip-stat-femur" class="val" style="color:#c084fc;">0.0&deg;</div>
+        </div>
+      </div>
+
+      <!-- Graphical Report (PDF / HTML) & Save Report Image (.PNG) Export Buttons -->
+      <div class="report-export-grid">
+        <button id="btn-ip-report" class="btn btn-report-html">
+          📊 Graphical Report (PDF / HTML)
+        </button>
+        <button id="btn-ip-png" class="btn btn-report-png">
+          🖼️ Save Report Image (.PNG)
+        </button>
+      </div>
+    </section>
+
   </div>
 
   <!-- Quick iPhone Bluefy & Knee Sleeve Guide Modal -->
@@ -864,6 +1109,14 @@
       let currentHz = 0;
       let recordedRows = [];
       let recStartTimeMs = 0;
+
+      // Saved Trials & 3D Replay State (shared with index.html via localStorage)
+      const TRIALS_STORAGE_KEY = 'ltu_ebl_xiao_trials_v1';
+      let savedTrials = [];
+      let selectedTrialIndex = 0;
+      let isReplayingTrial = false;
+      let replayTimer = null;
+      let replayFrameIdx = 0;
 
       // Range of Motion (ROM) & Rep Counter
       const rom = {
@@ -1083,8 +1336,16 @@
 
       // Perform immediate Standing Zero / Neutral Calibration
       function calibrateStandingNow(sendToBoard = true) {
+        if (isDemoMode) {
+          demoStartTime = performance.now();
+          rawAnglesLatest = { fe: 0, ru: 0, ps: 0 };
+        }
         neutralOffset = { ...rawAnglesLatest };
         joint3D.tare();
+        if (isDemoMode && joint3D && joint3D.s1LocalTare) {
+          joint3D.s1LocalTare.set(-1, 0, 0);
+          joint3D.hasTaredS1 = true;
+        }
         resetRomStats();
         markCalibratedBadge();
         if (sendToBoard) {
@@ -1103,29 +1364,34 @@
         const tot3d = Math.hypot(fe, ru, ps);
         const battPct = Math.max(0, Math.min(100, Math.round(((vbat - 3.3) / (4.18 - 3.3)) * 100)));
 
-        // 1. Update 3D Anatomical Knee / Wrist Model
-        joint3D.updateKinematics(
-          s1,
-          s2,
-          fe,
-          ru,
-          ps,
-          battPct,
-          currentJoint.toUpperCase(),
-          isCalibrated
-        );
+        // 1. Update 3D Anatomical Knee / Wrist Model (unless user is actively replaying a saved trial in 3D)
+        if (!isReplayingTrial) {
+          joint3D.updateKinematics(
+            s1,
+            s2,
+            fe,
+            ru,
+            ps,
+            battPct,
+            currentJoint.toUpperCase(),
+            isCalibrated
+          );
+        }
+        const femurPitch = (joint3D && typeof joint3D.currentFemurPitchDeg === 'number') ? joint3D.currentFemurPitchDeg : 0;
 
         // 2. Update Big Angle Cards
-        valFe.textContent = fe.toFixed(1);
-        valRu.textContent = ru.toFixed(1);
-        valPs.textContent = ps.toFixed(1);
+        if (!isReplayingTrial) {
+          valFe.textContent = fe.toFixed(1);
+          valRu.textContent = ru.toFixed(1);
+          valPs.textContent = ps.toFixed(1);
 
-        const fePct = currentJoint === 'knee'
-          ? ((fe + 15) / 155) * 100
-          : ((fe + 90) / 180) * 100;
-        barFe.style.width = `${Math.max(3, Math.min(100, fePct))}%`;
-        barRu.style.width = `${Math.max(3, Math.min(100, ((ru + 45) / 90) * 100))}%`;
-        barPs.style.width = `${Math.max(3, Math.min(100, ((ps + 45) / 90) * 100))}%`;
+          const fePct = currentJoint === 'knee'
+            ? ((fe + 15) / 155) * 100
+            : ((fe + 90) / 180) * 100;
+          barFe.style.width = `${Math.max(3, Math.min(100, fePct))}%`;
+          barRu.style.width = `${Math.max(3, Math.min(100, ((ru + 45) / 90) * 100))}%`;
+          barPs.style.width = `${Math.max(3, Math.min(100, ((ps + 45) / 90) * 100))}%`;
+        }
 
         // 3. Update ROM Min / Max / Span & Rep Counter
         const vals = { fe, ru, ps };
@@ -1176,20 +1442,23 @@
           const elapsedRecSec = (performance.now() - recStartTimeMs) / 1000;
           recordedRows.push({
             iso: new Date().toISOString(),
+            t: Number(elapsedRecSec.toFixed(3)),
             t_board: t.toFixed(3),
             t_rec: elapsedRecSec.toFixed(3),
             joint: currentJoint.toUpperCase(),
-            fe: fe.toFixed(2),
-            ru: ru.toFixed(2),
-            ps: ps.toFixed(2),
-            tot3d: tot3d.toFixed(2),
-            ax1: s1.ax.toFixed(3),
-            ay1: s1.ay.toFixed(3),
-            az1: s1.az.toFixed(3),
-            ax2: s2.ax.toFixed(3),
-            ay2: s2.ay.toFixed(3),
-            az2: s2.az.toFixed(3),
-            vbat: vbat.toFixed(2)
+            fe: Number(fe.toFixed(2)),
+            ru: Number(ru.toFixed(2)),
+            ps: Number(ps.toFixed(2)),
+            femur: Number(femurPitch.toFixed(2)),
+            tot3d: Number(tot3d.toFixed(2)),
+            tot: Number(tot3d.toFixed(2)),
+            ax1: Number(s1.ax.toFixed(3)),
+            ay1: Number(s1.ay.toFixed(3)),
+            az1: Number(s1.az.toFixed(3)),
+            ax2: Number(s2.ax.toFixed(3)),
+            ay2: Number(s2.ay.toFixed(3)),
+            az2: Number(s2.az.toFixed(3)),
+            vbat: Number(vbat.toFixed(2))
           });
           stripSamples.textContent = `${recordedRows.length} (${elapsedRecSec.toFixed(1)}s)`;
           btnShareCsv.disabled = false;
@@ -1324,33 +1593,48 @@
         }
       });
 
-      // 3D Demo Mode (Realistic Standing Knee Flexion Squat Cycle)
+      // 3D Demo Mode (Realistic Compound Femur + Tibia Standing Knee Squat / Step Cycle)
       function startDemoMode() {
+        if (isReplayingTrial) {
+          stopTrialReplay();
+        }
         isDemoMode = true;
         btnDemo.classList.add('active');
         btnDemo.textContent = 'Stop Demo';
         connDot.classList.add('live');
         connText.textContent = '3D Demo Live';
         demoStartTime = performance.now();
+        neutralOffset = { fe: 0, ru: 0, ps: 0 };
+        if (joint3D && joint3D.s1LocalTare) {
+          joint3D.s1LocalTare.set(-1, 0, 0);
+          joint3D.hasTaredS1 = true;
+        }
 
         demoTimer = setInterval(() => {
           const t = (performance.now() - demoStartTime) / 1000;
-          // Smooth standing knee squat cycle (0° standing neutral -> 95° knee flexion)
-          const cycle = 0.5 - 0.5 * Math.cos(2 * Math.PI * 0.35 * t);
-          const fe = 92.0 * Math.pow(cycle, 1.15);
-          const ru = 5.5 * Math.sin(2 * Math.PI * 0.35 * t);
-          const ps = -8.0 * cycle + 1.5 * Math.cos(2 * Math.PI * 0.7 * t);
+          // Compound Femur + Tibia movement during standing knee squat / step cycle
+          const cyc = 0.5 * (1 - Math.cos(t * 1.6));
+          const s1Pitch = 40.0 * cyc;
+          const rawFe = 90.0 * cyc;
+          const rawRu = 5.5 * Math.sin(t * 1.6);
+          const rawPs = -8.0 * cyc + 1.5 * Math.cos(t * 3.2);
 
-          const feRad = (fe * Math.PI) / 180;
-          const s1 = { ax: -9.81, ay: 0.15, az: 0.1 };
+          const s1PitchRad = (s1Pitch * Math.PI) / 180;
+          const totalPitch2Rad = ((s1Pitch - rawFe) * Math.PI) / 180;
+          const s1 = {
+            ax: -9.81 * Math.cos(s1PitchRad),
+            ay: 9.81 * Math.sin(s1PitchRad),
+            az: 0.12
+          };
           const s2 = {
-            ax: -9.81 * Math.cos(feRad),
-            ay: 9.81 * Math.sin(feRad),
+            ax: -9.81 * Math.cos(totalPitch2Rad),
+            ay: 9.81 * Math.sin(totalPitch2Rad),
             az: 0.25
           };
-          processSample(t, fe, ru, ps, s1, s2, 4.15);
+          processSample(t, rawFe, rawRu, rawPs, s1, s2, 4.15);
         }, 25);
       }
+      const startDemo = startDemoMode;
 
       function stopDemoMode() {
         isDemoMode = false;
@@ -1374,14 +1658,19 @@
 
       // Button 2: Start / Stop Recording (Auto-Calibrates Standing 0° right before recording)
       function setRecordingUI(active) {
+        const wasRecording = isRecording;
         isRecording = active;
         if (active) {
+          if (isReplayingTrial) stopTrialReplay();
           recStartTimeMs = performance.now();
           btnRecord.classList.add('recording');
           lblRecord.textContent = 'Stop Recording (Tap when Done)';
         } else {
           btnRecord.classList.remove('recording');
           lblRecord.textContent = 'Start Recording (Auto-Calibrates Standing 0°)';
+          if (wasRecording && recordedRows.length > 0) {
+            saveCompletedRecordingAsTrial(recordedRows);
+          }
         }
       }
 
@@ -1389,8 +1678,16 @@
         if (!isRecording) {
           // 1. Auto-calibrate standing neutral 0° immediately to eliminate drift
           recordedRows = [];
+          if (isDemoMode) {
+            demoStartTime = performance.now();
+            rawAnglesLatest = { fe: 0, ru: 0, ps: 0 };
+          }
           neutralOffset = { ...rawAnglesLatest };
           joint3D.tare();
+          if (isDemoMode && joint3D && joint3D.s1LocalTare) {
+            joint3D.s1LocalTare.set(-1, 0, 0);
+            joint3D.hasTaredS1 = true;
+          }
           resetRomStats();
           markCalibratedBadge();
 
@@ -1401,7 +1698,7 @@
         } else {
           setRecordingUI(false);
           sendCommand('CMD:REC_STOP');
-          showToast(`Recording stopped (${recordedRows.length} samples ready to Share/Export).`);
+          showToast(`Recording stopped & saved to Trials (${recordedRows.length} samples).`);
         }
       });
 
@@ -1431,7 +1728,11 @@
 
       // Button 4: Share / Export CSV (iOS Native Share Sheet for AirDrop/Files + Download Fallback)
       btnShareCsv.addEventListener('click', async () => {
-        if (!recordedRows.length) return;
+        const activeTrial = getSelectedTrial();
+        const rowsToExport = recordedRows.length > 0
+          ? recordedRows
+          : (activeTrial ? getTrialSamples(activeTrial) : []);
+        if (!rowsToExport.length) return;
 
         const headers = [
           'iso_timestamp',
@@ -1441,19 +1742,34 @@
           'flexion_extension_deg',
           'varus_valgus_deg',
           'internal_external_rot_deg',
+          'femur_pitch_deg',
           'total_3d_angle_deg',
           's1_ax_ms2', 's1_ay_ms2', 's1_az_ms2',
           's2_ax_ms2', 's2_ay_ms2', 's2_az_ms2',
           'vbat_v'
         ];
         const lines = [headers.join(',')];
-        recordedRows.forEach((r) => {
+        rowsToExport.forEach((r, idx) => {
+          const tVal = Number(r.t_rec ?? r.t ?? r.t_board ?? (idx * 0.025)).toFixed(3);
+          const tbVal = Number(r.t_board ?? r.t ?? tVal).toFixed(3);
+          const feVal = Number(r.fe ?? 0).toFixed(2);
+          const ruVal = Number(r.ru ?? 0).toFixed(2);
+          const psVal = Number(r.ps ?? 0).toFixed(2);
+          const femVal = Number(r.femur ?? r.femurPitch ?? 0).toFixed(2);
+          const totVal = Number(r.tot3d ?? r.tot ?? Math.hypot(Number(feVal), Number(ruVal), Number(psVal))).toFixed(2);
           lines.push([
-            r.iso, r.t_board, r.t_rec, r.joint,
-            r.fe, r.ru, r.ps, r.tot3d,
-            r.ax1, r.ay1, r.az1,
-            r.ax2, r.ay2, r.az2,
-            r.vbat
+            r.iso || new Date().toISOString(),
+            tbVal,
+            tVal,
+            r.joint || currentJoint.toUpperCase(),
+            feVal, ruVal, psVal, femVal, totVal,
+            Number(r.ax1 ?? -9.81).toFixed(3),
+            Number(r.ay1 ?? 0).toFixed(3),
+            Number(r.az1 ?? 0).toFixed(3),
+            Number(r.ax2 ?? -9.81).toFixed(3),
+            Number(r.ay2 ?? 0).toFixed(3),
+            Number(r.az2 ?? 0).toFixed(3),
+            Number(r.vbat ?? 4.15).toFixed(2)
           ].join(','));
         });
 
@@ -1469,7 +1785,7 @@
             if (navigator.canShare({ files: [file] })) {
               await navigator.share({
                 title: `XIAO ${currentJoint.toUpperCase()} 3D Kinematics CSV`,
-                text: `Recorded ${recordedRows.length} samples from XIAO Dual-IMU Knee Sleeve.`,
+                text: `Recorded ${rowsToExport.length} samples from XIAO Dual-IMU Knee Sleeve.`,
                 files: [file]
               });
               return;
@@ -1488,6 +1804,1067 @@
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+      });
+
+      // =========================================================================
+      // RECORDED TRIALS REVIEW, 3D REPLAY & GRAPHICAL REPORT ENGINE
+      // =========================================================================
+      const ipTrialsBadge = document.getElementById('ip-trials-badge');
+      const ipTrialSelect = document.getElementById('ip-trial-select');
+      const btnIpReplay = document.getElementById('btn-ip-replay');
+      const ipTrialScrub = document.getElementById('ip-trial-scrub');
+      const ipScrubTime = document.getElementById('ip-scrub-time');
+      const ipScrubPose = document.getElementById('ip-scrub-pose');
+      const ipTrialCanvas = document.getElementById('ip-trial-canvas');
+      const ipStatFe = document.getElementById('ip-stat-fe');
+      const ipStatRu = document.getElementById('ip-stat-ru');
+      const ipStatPs = document.getElementById('ip-stat-ps');
+      const ipStatFemur = document.getElementById('ip-stat-femur');
+      const btnIpReport = document.getElementById('btn-ip-report');
+      const btnIpPng = document.getElementById('btn-ip-png');
+
+      function getTrialSamples(trial) {
+        if (!trial) return [];
+        return Array.isArray(trial.samples)
+          ? trial.samples
+          : (Array.isArray(trial.data) ? trial.data : (Array.isArray(trial.rows) ? trial.rows : []));
+      }
+
+      function computeAxisStats(samples, getter, timeGetter) {
+        if (!samples || !samples.length) {
+          return { min: 0, max: 0, span: 0, mean: 0, sd: 0, peakVel: 0 };
+        }
+        let min = Infinity;
+        let max = -Infinity;
+        let sum = 0;
+        let peakVel = 0;
+        const vals = [];
+        for (let i = 0; i < samples.length; i++) {
+          const v = Number(getter(samples[i])) || 0;
+          vals.push(v);
+          if (v < min) min = v;
+          if (v > max) max = v;
+          sum += v;
+          if (i > 0) {
+            const dt = Math.max(0.008, (Number(timeGetter(samples[i], i)) - Number(timeGetter(samples[i - 1], i - 1))) || 0.025);
+            const vel = Math.abs(v - vals[i - 1]) / dt;
+            if (vel < 1800 && vel > peakVel) peakVel = vel;
+          }
+        }
+        const mean = sum / samples.length;
+        let varSum = 0;
+        for (let i = 0; i < vals.length; i++) {
+          varSum += (vals[i] - mean) * (vals[i] - mean);
+        }
+        const sd = Math.sqrt(varSum / samples.length);
+        return {
+          min: Number(min.toFixed(1)),
+          max: Number(max.toFixed(1)),
+          span: Number((max - min).toFixed(1)),
+          mean: Number(mean.toFixed(1)),
+          sd: Number(sd.toFixed(1)),
+          peakVel: Number(peakVel.toFixed(1))
+        };
+      }
+
+      function computeTrialSummary(trial) {
+        const samples = getTrialSamples(trial);
+        const rate = Number(trial?.sampleRateHz || 40);
+        const tGet = (s, i) => Number(s.t_rec ?? s.t ?? s.t_board ?? (i / rate));
+        const feStats = computeAxisStats(samples, (s) => s.fe, tGet);
+        const ruStats = computeAxisStats(samples, (s) => s.ru, tGet);
+        const psStats = computeAxisStats(samples, (s) => s.ps, tGet);
+        const femStats = computeAxisStats(samples, (s) => s.femur ?? s.femurPitch ?? 0, tGet);
+        const durationSec = samples.length > 1
+          ? Math.max(0.1, tGet(samples[samples.length - 1], samples.length - 1) - tGet(samples[0], 0))
+          : Number(trial?.durationSec || 0);
+
+        let reps = Number(trial?.reps ?? 0);
+        if (!reps && samples.length > 4) {
+          let inFlx = false;
+          let rCount = 0;
+          for (let i = 0; i < samples.length; i++) {
+            const fVal = Math.abs(Number(samples[i].fe) || 0);
+            if (!inFlx && fVal > 22) inFlx = true;
+            else if (inFlx && fVal < 8) { inFlx = false; rCount++; }
+          }
+          reps = rCount;
+        }
+        return {
+          fe: feStats,
+          ru: ruStats,
+          ps: psStats,
+          femur: femStats,
+          durationSec: Number(durationSec.toFixed(2)),
+          sampleCount: samples.length,
+          sampleRateHz: rate,
+          reps
+        };
+      }
+
+      function buildSeededKneeTrial() {
+        const samples = [];
+        const dt = 0.04; // 25 Hz over 6.0 seconds (151 samples, 2 full squat cycles)
+        const baseIso = Date.now() - 60000;
+        for (let i = 0; i <= 150; i++) {
+          const t = Number((i * dt).toFixed(3));
+          const cyc = 0.5 * (1 - Math.cos(t * 1.6));
+          const s1Pitch = 40.0 * cyc;
+          const fe = 90.0 * cyc;
+          const ru = 5.5 * Math.sin(t * 1.6);
+          const ps = -8.2 * cyc + 1.4 * Math.cos(t * 3.2);
+          const tot = Math.hypot(fe, ru, ps);
+          const s1Rad = (s1Pitch * Math.PI) / 180;
+          const s2Rad = ((s1Pitch - fe) * Math.PI) / 180;
+          samples.push({
+            iso: new Date(baseIso + i * 40).toISOString(),
+            t,
+            t_rec: t.toFixed(3),
+            t_board: t.toFixed(3),
+            joint: 'KNEE',
+            fe: Number(fe.toFixed(2)),
+            ru: Number(ru.toFixed(2)),
+            ps: Number(ps.toFixed(2)),
+            femur: Number(s1Pitch.toFixed(2)),
+            tot3d: Number(tot.toFixed(2)),
+            tot: Number(tot.toFixed(2)),
+            ax1: Number((-9.81 * Math.cos(s1Rad)).toFixed(3)),
+            ay1: Number((9.81 * Math.sin(s1Rad)).toFixed(3)),
+            az1: 0.12,
+            ax2: Number((-9.81 * Math.cos(s2Rad)).toFixed(3)),
+            ay2: Number((9.81 * Math.sin(s2Rad)).toFixed(3)),
+            az2: 0.25,
+            vbat: 4.15
+          });
+        }
+        const trial = {
+          id: 'seed_knee_squat_v1',
+          name: 'Trial #1 • KNEE Squat/Step (6.0s, 2 Reps)',
+          timestamp: new Date(baseIso).toISOString(),
+          joint: 'knee',
+          jointName: 'KNEE',
+          durationSec: 6.0,
+          sampleRateHz: 25,
+          sampleCount: samples.length,
+          reps: 2,
+          samples
+        };
+        trial.stats = computeTrialSummary(trial);
+        return trial;
+      }
+
+      function persistTrialsToStorage() {
+        try {
+          localStorage.setItem(TRIALS_STORAGE_KEY, JSON.stringify(savedTrials));
+        } catch (err) {
+          console.warn('Could not save trials to localStorage:', err);
+        }
+      }
+
+      function loadOrSeedTrials() {
+        try {
+          const raw = localStorage.getItem(TRIALS_STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              savedTrials = parsed;
+            }
+          }
+        } catch (e) {
+          console.warn('localStorage trials parse error:', e);
+        }
+        if (!savedTrials.length) {
+          savedTrials = [buildSeededKneeTrial()];
+          persistTrialsToStorage();
+        }
+        selectedTrialIndex = 0;
+        refreshTrialSelectorUI();
+        selectTrialByIndex(0, false);
+        btnShareCsv.disabled = false;
+      }
+
+      function saveCompletedRecordingAsTrial(rows) {
+        if (!rows || !rows.length) return;
+        const copyRows = rows.map((r, i) => ({
+          ...r,
+          t: Number(r.t ?? r.t_rec ?? (i * 0.025)),
+          fe: Number(r.fe ?? 0),
+          ru: Number(r.ru ?? 0),
+          ps: Number(r.ps ?? 0),
+          femur: Number(r.femur ?? r.femurPitch ?? 0),
+          tot3d: Number(r.tot3d ?? r.tot ?? 0),
+          tot: Number(r.tot ?? r.tot3d ?? 0)
+        }));
+        const dur = copyRows.length > 1
+          ? Math.max(0.1, Number(copyRows[copyRows.length - 1].t) - Number(copyRows[0].t))
+          : 0.5;
+        const trialNum = savedTrials.length + 1;
+        const jName = currentJoint.toUpperCase();
+        const newTrial = {
+          id: 'trial_' + Date.now(),
+          name: `Trial #${trialNum} • ${jName} (${dur.toFixed(1)}s, ${copyRows.length} pts)`,
+          timestamp: new Date().toISOString(),
+          joint: currentJoint,
+          jointName: jName,
+          durationSec: Number(dur.toFixed(2)),
+          sampleRateHz: currentHz || Math.max(10, Math.round(copyRows.length / Math.max(0.2, dur))),
+          sampleCount: copyRows.length,
+          reps: rom.reps || 0,
+          samples: copyRows
+        };
+        newTrial.stats = computeTrialSummary(newTrial);
+        savedTrials.unshift(newTrial);
+        if (savedTrials.length > 20) savedTrials.length = 20;
+        persistTrialsToStorage();
+        selectedTrialIndex = 0;
+        refreshTrialSelectorUI();
+        selectTrialByIndex(0, false);
+      }
+
+      function getSelectedTrial() {
+        return savedTrials[selectedTrialIndex] || savedTrials[0] || null;
+      }
+
+      function refreshTrialSelectorUI() {
+        if (!ipTrialSelect) return;
+        ipTrialSelect.innerHTML = '';
+        savedTrials.forEach((tr, idx) => {
+          const opt = document.createElement('option');
+          opt.value = String(idx);
+          const samples = getTrialSamples(tr);
+          opt.textContent = tr.name || tr.label || `Trial #${idx + 1} (${samples.length} pts)`;
+          ipTrialSelect.appendChild(opt);
+        });
+        ipTrialSelect.value = String(selectedTrialIndex);
+        if (ipTrialsBadge) {
+          ipTrialsBadge.textContent = `${savedTrials.length} ${savedTrials.length === 1 ? 'Trial' : 'Trials'}`;
+        }
+      }
+
+      function selectTrialByIndex(idx, applyPose = false) {
+        selectedTrialIndex = Math.max(0, Math.min(savedTrials.length - 1, idx));
+        const trial = getSelectedTrial();
+        if (!trial) return;
+        const samples = getTrialSamples(trial);
+        const summary = computeTrialSummary(trial);
+        trial.stats = summary;
+
+        if (ipStatFe) ipStatFe.textContent = `${summary.fe.span.toFixed(1)}°`;
+        if (ipStatRu) ipStatRu.textContent = `${summary.ru.span.toFixed(1)}°`;
+        if (ipStatPs) ipStatPs.textContent = `${summary.ps.span.toFixed(1)}°`;
+        if (ipStatFemur) ipStatFemur.textContent = `${summary.femur.span.toFixed(1)}°`;
+
+        if (ipTrialScrub) {
+          ipTrialScrub.min = '0';
+          ipTrialScrub.max = String(Math.max(0, samples.length - 1));
+          ipTrialScrub.value = '0';
+        }
+        replayFrameIdx = 0;
+        updateScrubberReadout(trial, 0);
+        drawTrialOverviewCanvas(trial, 0);
+        if (applyPose && samples.length > 0) {
+          applyTrialSampleTo3D(trial, 0, true);
+        }
+      }
+
+      function updateScrubberReadout(trial, frameIdx) {
+        const samples = getTrialSamples(trial);
+        if (!samples.length) return;
+        const clamped = Math.max(0, Math.min(samples.length - 1, frameIdx));
+        const s = samples[clamped];
+        const rate = Number(trial.sampleRateHz || 25);
+        const tCur = Number(s.t_rec ?? s.t ?? s.t_board ?? (clamped / rate));
+        const last = samples[samples.length - 1];
+        const tMax = Number(last.t_rec ?? last.t ?? last.t_board ?? ((samples.length - 1) / rate));
+        const fe = Number(s.fe ?? 0);
+        const fem = Number(s.femur ?? s.femurPitch ?? 0);
+
+        if (ipScrubTime) ipScrubTime.textContent = `${tCur.toFixed(2)} / ${tMax.toFixed(2)}s`;
+        if (ipScrubPose) ipScrubPose.textContent = `Flx ${fe.toFixed(1)}° | Fem ${fem.toFixed(1)}°`;
+      }
+
+      function applyTrialSampleTo3D(trial, frameIdx, instantConverge = false) {
+        const samples = getTrialSamples(trial);
+        if (!samples.length || !joint3D) return;
+        const clamped = Math.max(0, Math.min(samples.length - 1, frameIdx));
+        const s = samples[clamped];
+        const fe = Number(s.fe ?? 0);
+        const ru = Number(s.ru ?? 0);
+        const ps = Number(s.ps ?? 0);
+        const femPitch = Number(s.femur ?? s.femurPitch ?? 0);
+
+        const fpRad = (femPitch * Math.PI) / 180;
+        const tp2Rad = ((femPitch - fe) * Math.PI) / 180;
+        const s1Sim = {
+          ax: -9.81 * Math.cos(fpRad),
+          ay: 9.81 * Math.sin(fpRad),
+          az: 0.0
+        };
+        const s2Sim = {
+          ax: -9.81 * Math.cos(tp2Rad),
+          ay: 9.81 * Math.sin(tp2Rad),
+          az: 0.25
+        };
+
+        if (joint3D.s1LocalTare) {
+          joint3D.s1LocalTare.set(-1, 0, 0);
+          joint3D.hasTaredS1 = true;
+        }
+        const jName = String(trial.jointName || trial.joint || currentJoint).toUpperCase();
+        const passes = instantConverge ? 10 : 2;
+        for (let k = 0; k < passes; k++) {
+          joint3D.updateKinematics(s1Sim, s2Sim, fe, ru, ps, 96, jName, true);
+        }
+
+        // Update live angle cards to match 3D replay pose
+        valFe.textContent = fe.toFixed(1);
+        valRu.textContent = ru.toFixed(1);
+        valPs.textContent = ps.toFixed(1);
+        const fePct = ((fe + 15) / 155) * 100;
+        barFe.style.width = `${Math.max(3, Math.min(100, fePct))}%`;
+        barRu.style.width = `${Math.max(3, Math.min(100, ((ru + 45) / 90) * 100))}%`;
+        barPs.style.width = `${Math.max(3, Math.min(100, ((ps + 45) / 90) * 100))}%`;
+      }
+
+      // Multi-Axis Trial Overview Canvas Renderer (Flex/Ext, Var/Val, Int/Ext, Femur Tilt)
+      function drawTrialOverviewCanvas(trial, activeIdx = 0) {
+        if (!ipTrialCanvas) return;
+        const samples = getTrialSamples(trial);
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const rect = ipTrialCanvas.getBoundingClientRect();
+        const cssW = Math.max(260, rect.width || 340);
+        const cssH = Math.max(110, rect.height || 125);
+        if (ipTrialCanvas.width !== Math.round(cssW * dpr) || ipTrialCanvas.height !== Math.round(cssH * dpr)) {
+          ipTrialCanvas.width = Math.round(cssW * dpr);
+          ipTrialCanvas.height = Math.round(cssH * dpr);
+        }
+        const ctx = ipTrialCanvas.getContext('2d');
+        ctx.save();
+        ctx.scale(dpr, dpr);
+
+        ctx.fillStyle = '#080d19';
+        ctx.fillRect(0, 0, cssW, cssH);
+
+        const padL = 30, padR = 10, padT = 20, padB = 18;
+        const plotW = cssW - padL - padR;
+        const plotH = cssH - padT - padB;
+
+        if (!samples.length) {
+          ctx.fillStyle = '#64748b';
+          ctx.font = '11px sans-serif';
+          ctx.fillText('No trial samples available', padL + 20, cssH / 2);
+          ctx.restore();
+          return;
+        }
+
+        // Determine Y range across all 4 curves
+        let yMin = -20, yMax = 100;
+        for (let i = 0; i < samples.length; i++) {
+          const s = samples[i];
+          const vals = [Number(s.fe || 0), Number(s.ru || 0), Number(s.ps || 0), Number(s.femur ?? s.femurPitch ?? 0)];
+          for (let j = 0; j < vals.length; j++) {
+            if (vals[j] < yMin) yMin = vals[j] - 5;
+            if (vals[j] > yMax) yMax = vals[j] + 5;
+          }
+        }
+        const ySpan = Math.max(20, yMax - yMin);
+        const xForIdx = (i) => padL + (samples.length > 1 ? (i / (samples.length - 1)) * plotW : plotW / 2);
+        const yForDeg = (deg) => padT + plotH - ((deg - yMin) / ySpan) * plotH;
+
+        // Horizontal gridlines & degree labels
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.14)';
+        ctx.lineWidth = 1;
+        ctx.fillStyle = '#64748b';
+        ctx.font = '9px monospace';
+        const ticks = [0, 45, 90];
+        ticks.forEach((deg) => {
+          if (deg >= yMin && deg <= yMax) {
+            const y = yForDeg(deg);
+            ctx.beginPath();
+            ctx.moveTo(padL, y);
+            ctx.lineTo(padL + plotW, y);
+            ctx.stroke();
+            ctx.fillText(`${deg}°`, 3, y + 3);
+          }
+        });
+
+        // Legend at top
+        const series = [
+          { label: 'Flex/Ext', color: '#38bdf8', width: 2.0, get: (s) => Number(s.fe || 0) },
+          { label: 'Femur Tilt', color: '#c084fc', width: 1.8, get: (s) => Number(s.femur ?? s.femurPitch ?? 0) },
+          { label: 'Var/Val', color: '#34d399', width: 1.5, get: (s) => Number(s.ru || 0) },
+          { label: 'Int/Ext', color: '#fbbf24', width: 1.5, get: (s) => Number(s.ps || 0) }
+        ];
+
+        ctx.font = 'bold 9px sans-serif';
+        let lx = padL;
+        series.forEach((sr) => {
+          ctx.fillStyle = sr.color;
+          ctx.fillRect(lx, 6, 8, 3);
+          ctx.fillText(sr.label, lx + 11, 10);
+          lx += ctx.measureText(sr.label).width + 20;
+        });
+
+        // Draw curves
+        series.forEach((sr) => {
+          ctx.strokeStyle = sr.color;
+          ctx.lineWidth = sr.width;
+          ctx.beginPath();
+          for (let i = 0; i < samples.length; i++) {
+            const x = xForIdx(i);
+            const y = yForDeg(sr.get(samples[i]));
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        });
+
+        // Active Scrubber Playhead Cursor
+        const clamped = Math.max(0, Math.min(samples.length - 1, activeIdx));
+        const cx = xForIdx(clamped);
+        ctx.strokeStyle = 'rgba(248, 250, 252, 0.75)';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(cx, padT);
+        ctx.lineTo(cx, padT + plotH);
+        ctx.stroke();
+
+        series.forEach((sr) => {
+          const cy = yForDeg(sr.get(samples[clamped]));
+          ctx.fillStyle = sr.color;
+          ctx.beginPath();
+          ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Time axis labels
+        const rate = Number(trial.sampleRateHz || 25);
+        const last = samples[samples.length - 1];
+        const tMax = Number(last.t_rec ?? last.t ?? last.t_board ?? ((samples.length - 1) / rate));
+        ctx.fillStyle = '#64748b';
+        ctx.font = '9px monospace';
+        ctx.fillText('0.0s', padL, cssH - 4);
+        const endText = `${tMax.toFixed(1)}s`;
+        ctx.fillText(endText, padL + plotW - ctx.measureText(endText).width, cssH - 4);
+
+        ctx.restore();
+      }
+
+      // 3D Trial Replay Start / Stop
+      function startTrialReplay() {
+        const trial = getSelectedTrial();
+        const samples = getTrialSamples(trial);
+        if (!trial || !samples.length) return;
+
+        isReplayingTrial = true;
+        btnIpReplay.classList.add('replaying');
+        btnIpReplay.textContent = '⏹ Live';
+        calBadge.textContent = `3D Replay: ${trial.name || 'Saved Trial'}`;
+
+        if (replayFrameIdx >= samples.length - 1) {
+          replayFrameIdx = 0;
+        }
+        applyTrialSampleTo3D(trial, replayFrameIdx, true);
+
+        if (replayTimer) clearInterval(replayTimer);
+        replayTimer = setInterval(() => {
+          const activeTrial = getSelectedTrial();
+          const sList = getTrialSamples(activeTrial);
+          if (!sList.length) {
+            stopTrialReplay();
+            return;
+          }
+          replayFrameIdx = (replayFrameIdx + 1) % sList.length;
+          if (ipTrialScrub) ipTrialScrub.value = String(replayFrameIdx);
+          updateScrubberReadout(activeTrial, replayFrameIdx);
+          drawTrialOverviewCanvas(activeTrial, replayFrameIdx);
+          applyTrialSampleTo3D(activeTrial, replayFrameIdx, false);
+        }, 35);
+      }
+
+      function stopTrialReplay() {
+        isReplayingTrial = false;
+        if (replayTimer) clearInterval(replayTimer);
+        replayTimer = null;
+        if (btnIpReplay) {
+          btnIpReplay.classList.remove('replaying');
+          btnIpReplay.textContent = '▶ Replay in 3D';
+        }
+        calBadge.textContent = isCalibrated
+          ? 'Calibrated Standing (0°, 0°, 0°)'
+          : 'Uncalibrated (Stand Still & Record)';
+      }
+
+      if (ipTrialSelect) {
+        ipTrialSelect.addEventListener('change', () => {
+          const idx = parseInt(ipTrialSelect.value, 10) || 0;
+          selectTrialByIndex(idx, true);
+        });
+      }
+
+      if (btnIpReplay) {
+        btnIpReplay.addEventListener('click', () => {
+          if (isReplayingTrial) {
+            stopTrialReplay();
+          } else {
+            startTrialReplay();
+          }
+        });
+      }
+
+      if (ipTrialScrub) {
+        ipTrialScrub.addEventListener('input', () => {
+          const trial = getSelectedTrial();
+          if (!trial) return;
+          if (replayTimer) {
+            clearInterval(replayTimer);
+            replayTimer = null;
+          }
+          isReplayingTrial = true;
+          if (btnIpReplay) {
+            btnIpReplay.classList.add('replaying');
+            btnIpReplay.textContent = '⏹ Live';
+          }
+          replayFrameIdx = parseInt(ipTrialScrub.value, 10) || 0;
+          updateScrubberReadout(trial, replayFrameIdx);
+          drawTrialOverviewCanvas(trial, replayFrameIdx);
+          applyTrialSampleTo3D(trial, replayFrameIdx, true);
+        });
+      }
+
+      if (ipTrialCanvas) {
+        const scrubFromCanvasEvent = (ev) => {
+          const trial = getSelectedTrial();
+          const samples = getTrialSamples(trial);
+          if (!trial || !samples.length) return;
+          const rect = ipTrialCanvas.getBoundingClientRect();
+          const clientX = ev.touches && ev.touches[0] ? ev.touches[0].clientX : ev.clientX;
+          const relX = Math.max(0, Math.min(1, (clientX - rect.left - 30) / Math.max(40, rect.width - 40)));
+          const idx = Math.round(relX * (samples.length - 1));
+          if (ipTrialScrub) ipTrialScrub.value = String(idx);
+          replayFrameIdx = idx;
+          updateScrubberReadout(trial, idx);
+          drawTrialOverviewCanvas(trial, idx);
+          applyTrialSampleTo3D(trial, idx, true);
+        };
+        let isDraggingCanvas = false;
+        ipTrialCanvas.addEventListener('pointerdown', (e) => {
+          isDraggingCanvas = true;
+          scrubFromCanvasEvent(e);
+        });
+        window.addEventListener('pointermove', (e) => {
+          if (isDraggingCanvas) scrubFromCanvasEvent(e);
+        });
+        window.addEventListener('pointerup', () => {
+          isDraggingCanvas = false;
+        });
+      }
+
+      // =========================================================================
+      // GRAPHICAL REPORT GENERATOR (PDF / HTML & COMBINED POSTER .PNG)
+      // =========================================================================
+      function captureRepresentative3DSnapshot(trial) {
+        if (!joint3D || typeof joint3D.captureSnapshotDataURL !== 'function') return null;
+        const samples = getTrialSamples(trial);
+        if (samples.length > 0 && Math.abs(joint3D.currentFeDeg || 0) < 5) {
+          // Pose 3D model at peak flexion frame for an informative biomechanical 3D snapshot
+          let peakIdx = 0;
+          let maxFe = -Infinity;
+          for (let i = 0; i < samples.length; i++) {
+            const f = Math.abs(Number(samples[i].fe) || 0);
+            if (f > maxFe) { maxFe = f; peakIdx = i; }
+          }
+          applyTrialSampleTo3D(trial, peakIdx, true);
+        }
+        return joint3D.captureSnapshotDataURL();
+      }
+
+      function renderHighResTimeSeriesDataURL(trial, width = 960, height = 340) {
+        const c = document.createElement('canvas');
+        c.width = width;
+        c.height = height;
+        const ctx = c.getContext('2d');
+        const samples = getTrialSamples(trial);
+
+        ctx.fillStyle = '#0b1221';
+        ctx.fillRect(0, 0, width, height);
+
+        const padL = 56, padR = 24, padT = 44, padB = 42;
+        const plotW = width - padL - padR;
+        const plotH = height - padT - padB;
+
+        let yMin = -25, yMax = 105;
+        samples.forEach((s) => {
+          [Number(s.fe || 0), Number(s.ru || 0), Number(s.ps || 0), Number(s.femur ?? s.femurPitch ?? 0)].forEach((v) => {
+            if (v < yMin) yMin = Math.floor((v - 5) / 10) * 10;
+            if (v > yMax) yMax = Math.ceil((v + 5) / 10) * 10;
+          });
+        });
+        const ySpan = Math.max(30, yMax - yMin);
+        const xAt = (i) => padL + (samples.length > 1 ? (i / (samples.length - 1)) * plotW : plotW / 2);
+        const yAt = (deg) => padT + plotH - ((deg - yMin) / ySpan) * plotH;
+
+        // Gridlines
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.18)';
+        ctx.lineWidth = 1;
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '12px monospace';
+        for (let g = -20; g <= 100; g += 20) {
+          if (g >= yMin && g <= yMax) {
+            const y = yAt(g);
+            ctx.beginPath();
+            ctx.moveTo(padL, y);
+            ctx.lineTo(padL + plotW, y);
+            ctx.stroke();
+            ctx.fillText(`${g}°`, 12, y + 4);
+          }
+        }
+
+        // Title & Legend
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.fillText('Multi-Axis 3D Joint & Femur Kinematics Time-Series (°)', padL, 24);
+
+        const curves = [
+          { label: 'Flexion / Extension (°)', color: '#38bdf8', w: 3.0, get: (s) => Number(s.fe || 0) },
+          { label: 'Femur Sagittal Tilt (°)', color: '#c084fc', w: 2.5, get: (s) => Number(s.femur ?? s.femurPitch ?? 0) },
+          { label: 'Varus / Valgus (°)', color: '#34d399', w: 2.2, get: (s) => Number(s.ru || 0) },
+          { label: 'Int / Ext Rotation (°)', color: '#fbbf24', w: 2.2, get: (s) => Number(s.ps || 0) }
+        ];
+
+        let lx = width - padR - 510;
+        ctx.font = 'bold 11px sans-serif';
+        curves.forEach((cv) => {
+          ctx.fillStyle = cv.color;
+          ctx.fillRect(lx, 15, 12, 4);
+          ctx.fillText(cv.label, lx + 16, 21);
+          lx += ctx.measureText(cv.label).width + 28;
+        });
+
+        curves.forEach((cv) => {
+          ctx.strokeStyle = cv.color;
+          ctx.lineWidth = cv.w;
+          ctx.beginPath();
+          samples.forEach((s, i) => {
+            const x = xAt(i);
+            const y = yAt(cv.get(s));
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          });
+          ctx.stroke();
+        });
+
+        // X-axis Time Labels
+        const summary = computeTrialSummary(trial);
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '12px monospace';
+        for (let k = 0; k <= 5; k++) {
+          const frac = k / 5;
+          const x = padL + frac * plotW;
+          const tVal = (frac * summary.durationSec).toFixed(2) + 's';
+          ctx.fillText(tVal, x - 14, height - 14);
+        }
+
+        return c.toDataURL('image/png');
+      }
+
+      function renderHighResRomBarDataURL(trial, width = 620, height = 340) {
+        const c = document.createElement('canvas');
+        c.width = width;
+        c.height = height;
+        const ctx = c.getContext('2d');
+        const st = computeTrialSummary(trial);
+
+        ctx.fillStyle = '#0b1221';
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.fillText('Range of Motion (ROM Span) & Segment Excursion (°)', 24, 28);
+
+        const items = [
+          { name: 'Flexion / Extension', stat: st.fe, color: '#38bdf8' },
+          { name: 'Femur Sagittal Tilt', stat: st.femur, color: '#c084fc' },
+          { name: 'Varus / Valgus', stat: st.ru, color: '#34d399' },
+          { name: 'Int / Ext Rotation', stat: st.ps, color: '#fbbf24' }
+        ];
+
+        const maxSpan = Math.max(95, ...items.map((it) => it.stat.span));
+        const barStartX = 175;
+        const barMaxW = width - barStartX - 95;
+
+        items.forEach((it, idx) => {
+          const y = 65 + idx * 66;
+          ctx.fillStyle = '#e2e8f0';
+          ctx.font = 'bold 12px sans-serif';
+          ctx.fillText(it.name, 20, y + 14);
+
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = '11px monospace';
+          ctx.fillText(`[${it.stat.min.toFixed(1)}° to ${it.stat.max.toFixed(1)}°]`, 20, y + 32);
+
+          // Track background
+          ctx.fillStyle = 'rgba(148, 163, 184, 0.14)';
+          ctx.fillRect(barStartX, y + 4, barMaxW, 24);
+
+          // Fill bar
+          const w = Math.max(6, (it.stat.span / maxSpan) * barMaxW);
+          ctx.fillStyle = it.color;
+          ctx.fillRect(barStartX, y + 4, w, 24);
+
+          ctx.fillStyle = '#f8fafc';
+          ctx.font = 'bold 13px monospace';
+          ctx.fillText(`${it.stat.span.toFixed(1)}°`, barStartX + w + 10, y + 21);
+        });
+
+        return c.toDataURL('image/png');
+      }
+
+      // Generate Combined Graphical Report Poster Canvas (.PNG)
+      function buildCombinedReportPosterCanvas(trial) {
+        const poster = document.createElement('canvas');
+        poster.width = 1400;
+        poster.height = 1020;
+        const ctx = poster.getContext('2d');
+        const st = computeTrialSummary(trial);
+        captureRepresentative3DSnapshot(trial);
+
+        // Background
+        ctx.fillStyle = '#070c17';
+        ctx.fillRect(0, 0, poster.width, poster.height);
+
+        // Header Banner
+        const grad = ctx.createLinearGradient(0, 0, poster.width, 0);
+        grad.addColorStop(0, '#0f172a');
+        grad.addColorStop(0.5, '#1e3a8a');
+        grad.addColorStop(1, '#0284c7');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, poster.width, 92);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 24px sans-serif';
+        ctx.fillText('LTU Experimental Biomechanics Laboratory (EBL) • 3D Joint Kinematics Report', 28, 40);
+
+        ctx.fillStyle = '#bae6fd';
+        ctx.font = '14px monospace';
+        const metaLine = `${trial.name || 'Recorded Trial'}  |  Joint: ${(trial.jointName || currentJoint).toUpperCase()}  |  Duration: ${st.durationSec}s (${st.sampleCount} samples @ ${st.sampleRateHz} Hz)  |  Flexion Reps: ${st.reps}`;
+        ctx.fillText(metaLine, 28, 70);
+
+        // Top-Left Card: 3D Anatomical Model Snapshot
+        ctx.fillStyle = '#0f172a';
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.28)';
+        ctx.lineWidth = 1.5;
+        ctx.fillRect(28, 114, 520, 360);
+        ctx.strokeRect(28, 114, 520, 360);
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.fillText('3D ANATOMICAL FEMUR & TIBIA DUAL-IMU SNAPSHOT', 44, 140);
+
+        if (joint3D && joint3D.renderer && joint3D.renderer.domElement) {
+          try {
+            ctx.drawImage(joint3D.renderer.domElement, 44, 152, 488, 306);
+          } catch (e) {}
+        }
+
+        // Top-Right Card: Range of Motion & Femur Excursion Bar Chart + KPI Summary
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(572, 114, 800, 360);
+        ctx.strokeRect(572, 114, 800, 360);
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.fillText('3-DOF RANGE OF MOTION (ROM) & FEMUR TILT SUMMARY', 592, 140);
+
+        const bars = [
+          { name: 'Flexion / Extension', stat: st.fe, color: '#38bdf8' },
+          { name: 'Femur Sagittal Tilt (S1)', stat: st.femur, color: '#c084fc' },
+          { name: 'Varus / Valgus (Ab/Add)', stat: st.ru, color: '#34d399' },
+          { name: 'Int / Ext Axial Rotation', stat: st.ps, color: '#fbbf24' }
+        ];
+        const maxBarSpan = Math.max(95, ...bars.map((b) => b.stat.span));
+        bars.forEach((b, i) => {
+          const y = 166 + i * 74;
+          ctx.fillStyle = '#f8fafc';
+          ctx.font = 'bold 14px sans-serif';
+          ctx.fillText(b.name, 594, y + 16);
+
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = '12px monospace';
+          ctx.fillText(`Min: ${b.stat.min.toFixed(1)}°  Max: ${b.stat.max.toFixed(1)}°  Mean: ${b.stat.mean.toFixed(1)}° ± ${b.stat.sd.toFixed(1)}°  Peak ω: ${b.stat.peakVel.toFixed(0)}°/s`, 594, y + 36);
+
+          const bx = 594, bw = 640, bh = 16;
+          ctx.fillStyle = 'rgba(148, 163, 184, 0.15)';
+          ctx.fillRect(bx, y + 44, bw, bh);
+          const fillW = Math.max(8, (b.stat.span / maxBarSpan) * bw);
+          ctx.fillStyle = b.color;
+          ctx.fillRect(bx, y + 44, fillW, bh);
+
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 14px monospace';
+          ctx.fillText(`ROM ${b.stat.span.toFixed(1)}°`, bx + bw + 14, y + 57);
+        });
+
+        // Bottom Full-Width Card: Multi-Axis Time-Series Plot
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(28, 494, 1344, 496);
+        ctx.strokeRect(28, 494, 1344, 496);
+
+        const samples = getTrialSamples(trial);
+        const padL = 88, padR = 56, padT = 540, padB = 945;
+        const plotW = 1344 - 88;
+        const plotH = padB - padT;
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.fillText('MULTI-AXIS TIME-SERIES WAVEFORM (FLEX/EXT, FEMUR TILT, VARUS/VALGUS, INT/EXT ROTATION)', 48, 522);
+
+        let yMin = -25, yMax = 105;
+        samples.forEach((s) => {
+          [Number(s.fe || 0), Number(s.ru || 0), Number(s.ps || 0), Number(s.femur ?? s.femurPitch ?? 0)].forEach((v) => {
+            if (v < yMin) yMin = Math.floor((v - 5) / 10) * 10;
+            if (v > yMax) yMax = Math.ceil((v + 5) / 10) * 10;
+          });
+        });
+        const ySpan = Math.max(30, yMax - yMin);
+        const xAt = (i) => padL + (samples.length > 1 ? (i / (samples.length - 1)) * plotW : plotW / 2);
+        const yAt = (deg) => padT + plotH - ((deg - yMin) / ySpan) * plotH;
+
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.16)';
+        ctx.lineWidth = 1;
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '12px monospace';
+        for (let g = -20; g <= 100; g += 20) {
+          if (g >= yMin && g <= yMax) {
+            const y = yAt(g);
+            ctx.beginPath();
+            ctx.moveTo(padL, y);
+            ctx.lineTo(padL + plotW, y);
+            ctx.stroke();
+            ctx.fillText(`${g}°`, 44, y + 4);
+          }
+        }
+
+        const series = [
+          { label: 'Flexion / Extension (°)', color: '#38bdf8', w: 3.2, get: (s) => Number(s.fe || 0) },
+          { label: 'Femur Sagittal Tilt (°)', color: '#c084fc', w: 2.6, get: (s) => Number(s.femur ?? s.femurPitch ?? 0) },
+          { label: 'Varus / Valgus (°)', color: '#34d399', w: 2.2, get: (s) => Number(s.ru || 0) },
+          { label: 'Int / Ext Rotation (°)', color: '#fbbf24', w: 2.2, get: (s) => Number(s.ps || 0) }
+        ];
+
+        let lx = 760;
+        ctx.font = 'bold 12px sans-serif';
+        series.forEach((sr) => {
+          ctx.fillStyle = sr.color;
+          ctx.fillRect(lx, 512, 14, 4);
+          ctx.fillText(sr.label, lx + 18, 519);
+          lx += ctx.measureText(sr.label).width + 34;
+        });
+
+        series.forEach((sr) => {
+          ctx.strokeStyle = sr.color;
+          ctx.lineWidth = sr.w;
+          ctx.beginPath();
+          samples.forEach((s, i) => {
+            const x = xAt(i);
+            const y = yAt(sr.get(s));
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          });
+          ctx.stroke();
+        });
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '12px monospace';
+        for (let k = 0; k <= 6; k++) {
+          const frac = k / 6;
+          const x = padL + frac * plotW;
+          ctx.fillText(`${(frac * st.durationSec).toFixed(2)}s`, x - 16, 972);
+        }
+
+        return poster;
+      }
+
+      // Button: Graphical Report (PDF / HTML)
+      if (btnIpReport) {
+        btnIpReport.addEventListener('click', () => {
+          const trial = getSelectedTrial();
+          if (!trial) return;
+          const st = computeTrialSummary(trial);
+          const snapUrl = captureRepresentative3DSnapshot(trial) || '';
+          const tsPlotUrl = renderHighResTimeSeriesDataURL(trial);
+          const romPlotUrl = renderHighResRomBarDataURL(trial);
+
+          const reportHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LTU EBL 3D Kinematic Report • ${trial.name || 'Trial'}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0b1221; color: #f8fafc; margin: 0; padding: 18px; }
+    .report-shell { max-width: 980px; margin: 0 auto; background: #131c31; border: 1px solid rgba(148,163,184,0.25); border-radius: 16px; padding: 20px; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .btn-act { background: #0284c7; color: #fff; border: none; border-radius: 10px; padding: 10px 16px; font-weight: 700; cursor: pointer; font-size: 14px; }
+    .header-box { background: linear-gradient(135deg, #1e3a8a, #0284c7); border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; }
+    .header-box h1 { margin: 0 0 6px 0; font-size: 20px; }
+    .header-box p { margin: 0; font-size: 13px; color: #e0f2fe; }
+    .grid-top { display: grid; grid-template-columns: 1fr 1.15fr; gap: 14px; margin-bottom: 16px; }
+    .panel { background: #0b1221; border: 1px solid rgba(148,163,184,0.22); border-radius: 12px; padding: 12px; }
+    .panel h3 { margin: 0 0 8px 0; font-size: 13px; color: #38bdf8; text-transform: uppercase; }
+    .panel img { width: 100%; height: auto; border-radius: 8px; display: block; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
+    th, td { padding: 9px 10px; text-align: left; border-bottom: 1px solid rgba(148,163,184,0.18); }
+    th { color: #94a3b8; font-size: 11px; text-transform: uppercase; }
+    @media (max-width: 680px) { .grid-top { grid-template-columns: 1fr; } }
+    @media print { .toolbar { display: none; } body { background: #fff; color: #0f172a; padding: 0; } .report-shell, .panel { background: #fff; border-color: #cbd5e1; color: #0f172a; } }
+  </style>
+</head>
+<body>
+  <div class="report-shell">
+    <div class="toolbar">
+      <strong>LTU Experimental Biomechanics Laboratory (EBL)</strong>
+      <div>
+        <button class="btn-act" onclick="window.print()">🖨️ Print / Save as PDF</button>
+      </div>
+    </div>
+    <div class="header-box">
+      <h1>XIAO Dual-IMU 3D Knee &amp; Joint Kinematic Analysis Report</h1>
+      <p>${trial.name || 'Trial'} &bull; Joint: ${(trial.jointName || currentJoint).toUpperCase()} &bull; Samples: ${st.sampleCount} (${st.durationSec}s @ ${st.sampleRateHz} Hz) &bull; Flexion Reps: ${st.reps}</p>
+    </div>
+    <div class="grid-top">
+      <div class="panel">
+        <h3>3D Anatomical Femur &amp; Tibia Dual-IMU Model</h3>
+        <img src="${snapUrl}" alt="3D Anatomical Snapshot">
+      </div>
+      <div class="panel">
+        <h3>Range of Motion (ROM) &amp; Segment Excursion</h3>
+        <img src="${romPlotUrl}" alt="ROM Bar Chart">
+      </div>
+    </div>
+    <div class="panel" style="margin-bottom: 16px;">
+      <h3>Multi-Axis Time-Series Kinematics (Flex/Ext, Femur Tilt, Var/Val, Int/Ext)</h3>
+      <img src="${tsPlotUrl}" alt="Time Series Plot">
+    </div>
+    <div class="panel">
+      <h3>Biomechanical Summary Statistics Table</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Kinematic Axis / Segment</th>
+            <th>Min (&deg;)</th>
+            <th>Max (&deg;)</th>
+            <th>ROM Span (&deg;)</th>
+            <th>Mean &plusmn; SD (&deg;)</th>
+            <th>Peak Angular Vel (&deg;/s)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:#38bdf8;font-weight:700;">Knee Flexion / Extension</td>
+            <td>${st.fe.min.toFixed(1)}&deg;</td>
+            <td>${st.fe.max.toFixed(1)}&deg;</td>
+            <td><strong>${st.fe.span.toFixed(1)}&deg;</strong></td>
+            <td>${st.fe.mean.toFixed(1)}&deg; &plusmn; ${st.fe.sd.toFixed(1)}&deg;</td>
+            <td>${st.fe.peakVel.toFixed(1)} &deg;/s</td>
+          </tr>
+          <tr>
+            <td style="color:#c084fc;font-weight:700;">Femur Sagittal Tilt (S1 0x69)</td>
+            <td>${st.femur.min.toFixed(1)}&deg;</td>
+            <td>${st.femur.max.toFixed(1)}&deg;</td>
+            <td><strong>${st.femur.span.toFixed(1)}&deg;</strong></td>
+            <td>${st.femur.mean.toFixed(1)}&deg; &plusmn; ${st.femur.sd.toFixed(1)}&deg;</td>
+            <td>${st.femur.peakVel.toFixed(1)} &deg;/s</td>
+          </tr>
+          <tr>
+            <td style="color:#34d399;font-weight:700;">Varus / Valgus (Ab/Adduction)</td>
+            <td>${st.ru.min.toFixed(1)}&deg;</td>
+            <td>${st.ru.max.toFixed(1)}&deg;</td>
+            <td><strong>${st.ru.span.toFixed(1)}&deg;</strong></td>
+            <td>${st.ru.mean.toFixed(1)}&deg; &plusmn; ${st.ru.sd.toFixed(1)}&deg;</td>
+            <td>${st.ru.peakVel.toFixed(1)} &deg;/s</td>
+          </tr>
+          <tr>
+            <td style="color:#fbbf24;font-weight:700;">Int / Ext Tibial Rotation</td>
+            <td>${st.ps.min.toFixed(1)}&deg;</td>
+            <td>${st.ps.max.toFixed(1)}&deg;</td>
+            <td><strong>${st.ps.span.toFixed(1)}&deg;</strong></td>
+            <td>${st.ps.mean.toFixed(1)}&deg; &plusmn; ${st.ps.sd.toFixed(1)}&deg;</td>
+            <td>${st.ps.peakVel.toFixed(1)} &deg;/s</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>`;
+
+          const win = window.open('', '_blank');
+          if (win && win.document) {
+            win.document.open();
+            win.document.write(reportHtml);
+            win.document.close();
+          } else {
+            // Fallback download/share if popup blocked on mobile WebView
+            const blob = new Blob([reportHtml], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `LTU_EBL_3D_Report_${Date.now()}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }
+          showToast('Generated Graphical Kinematic Analysis Report (PDF / HTML)!');
+        });
+      }
+
+      // Button: Save Report Image (.PNG) with iOS Native Share Sheet (Save to Photos / Files / AirDrop)
+      if (btnIpPng) {
+        btnIpPng.addEventListener('click', () => {
+          const trial = getSelectedTrial();
+          if (!trial) return;
+          const posterCanvas = buildCombinedReportPosterCanvas(trial);
+          const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+          const filename = `LTU_EBL_XIAO_${(trial.jointName || currentJoint).toUpperCase()}_Report_${stamp}.png`;
+
+          posterCanvas.toBlob(async (blob) => {
+            if (!blob) return;
+            if (navigator.canShare && typeof File !== 'undefined') {
+              try {
+                const file = new File([blob], filename, { type: 'image/png' });
+                if (navigator.canShare({ files: [file] })) {
+                  await navigator.share({
+                    title: 'LTU EBL 3D Joint Kinematics Report (.PNG)',
+                    text: `${trial.name || 'Recorded Trial'} — 3D Knee Kinematics Report`,
+                    files: [file]
+                  });
+                  showToast('Shared Graphical Report Poster (.PNG)!');
+                  return;
+                }
+              } catch (err) {
+                if (err && err.name === 'AbortError') return;
+              }
+            }
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Saved Graphical Report Poster (.PNG)!');
+          }, 'image/png');
+        });
+      }
+
+      // Initialize Saved Trials & Multi-Axis Overview Canvas on Page Load
+      loadOrSeedTrials();
+      window.addEventListener('resize', () => {
+        const tr = getSelectedTrial();
+        if (tr) drawTrialOverviewCanvas(tr, replayFrameIdx);
       });
 
       // Help Modal
