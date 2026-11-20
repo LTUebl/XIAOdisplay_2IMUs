@@ -27,8 +27,8 @@ Because standard iOS Safari does not expose the Web Bluetooth API, connecting di
 1. **Install Bluefy on iPhone**: Download **[Bluefy – Web BLE Browser](https://apps.apple.com/us/app/bluefy-web-ble-browser/id1492822055)** (free on the iOS App Store).
 2. **Power On the Knee Sleeve**: Slide the XIAO 3.7V LiPo power switch **ON**. The XIAO begins advertising over Bluetooth Low Energy as **`XIAO-IMU`** (Nordic UART Service `6e400001-b5a3-f393-e0a9-e50e24dcca9e`).
 3. **Open the Web App in Bluefy**:
-   * **Simple Single-Screen iPhone App**: Open `https://ltuebl.github.io/wearables_circuitpython/XIAOdisplay_2IMUs/iphone.html`
-   * **Full Lab Dashboard (iPhone & Desktop)**: Open `https://ltuebl.github.io/wearables_circuitpython/XIAOdisplay_2IMUs/index.html`
+   * **Simple Single-Screen iPhone App**: Open [`https://ltuebl.github.io/XIAOdisplay_2IMUs/iphone.html`](https://ltuebl.github.io/XIAOdisplay_2IMUs/iphone.html)
+   * **Full Lab Dashboard (iPhone & Desktop)**: Open [`https://ltuebl.github.io/XIAOdisplay_2IMUs/`](https://ltuebl.github.io/XIAOdisplay_2IMUs/)
 4. **Connect Bluetooth**: Tap **Connect Bluetooth (`XIAO-IMU`)** and select **`XIAO-IMU`** from the popup sheet.
 5. **Stand Still & Tap Start Recording**: Have the subject stand upright in neutral anatomical posture (`0°`) and tap **Start Recording (Auto-Calibrates Standing 0°)**.
 6. **AirDrop / Save CSV**: When finished, tap **Stop Recording** and tap **Share / Export CSV** to open the native iOS Share Sheet (AirDrop directly to a Mac/iPad or Save to iPhone Files).
