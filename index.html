@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="XIAO Knee 3D">
+  <meta name="theme-color" content="#0f172a">
+  <title>XIAO Dual-IMU 3D Knee &amp; Joint Kinematics | iPhone BLE &amp; Web Control</title>
+  <link rel="stylesheet" href="./style.css">
+  <!-- Three.js and OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <!-- Chart.js for Real-Time Multi-Axis Kinematics & Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Dismissible iOS Web Bluetooth Helper Banner (Shown automatically on iOS when navigator.bluetooth is missing) -->
+  <div id="ios-ble-banner" class="ios-ble-banner" style="display:none;">
+    <div class="ios-ble-banner-text">
+      <strong>📱 iPhone Direct Bluetooth Tip:</strong> Open this page in the free <strong>&ldquo;Bluefy &ndash; Web BLE Browser&rdquo;</strong> app from the iOS App Store to enable direct Bluetooth connection on iPhone.
+    </div>
+    <button id="btn-dismiss-ios-banner" class="ios-banner-close" aria-label="Dismiss tip">&times;</button>
+  </div>
+
+  <!-- Top Connection & Joint Control Header -->
+  <header class="app-header">
+    <div class="brand-section">
+      <img src="./EBLlogo.png" alt="LTU EBL Logo" class="brand-logo-img">
+      <div class="brand-title">
+        <h1>XIAO Dual-IMU 3D Joint Kinematics</h1>
+        <p>Thigh S1 (0x69) + Lower Leg S2 (0x68) &bull; Direct iPhone Bluetooth &amp; USB</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Anatomical Joint Selector (Default: Knee Joint) -->
+      <select id="joint-preset-select" class="joint-select" title="Select Anatomical Joint Configuration">
+        <option value="knee" selected>Knee Joint (Thigh &rarr; Lower Leg)</option>
+        <option value="wrist">Wrist Joint (Forearm &rarr; Hand)</option>
+        <option value="elbow">Elbow Joint (Upper Arm &rarr; Forearm)</option>
+        <option value="ankle">Ankle Joint (Lower Leg &rarr; Foot)</option>
+      </select>
+
+      <!-- Connection Status Pill -->
+      <div id="connection-status" class="status-pill">
+        <span class="status-dot"></span>
+        <span id="connection-text">Disconnected</span>
+      </div>
+
+      <!-- Primary Connect Bluetooth (iPhone / BLE) + Secondary USB & 3D Demo -->
+      <button id="btn-connect-ble" class="btn btn-ble btn-connect-main" title="Connect directly via Bluetooth Low Energy (iPhone Bluefy / Mac / PC)">
+        <span class="btn-icon">&#x1F4F6;</span> Connect Bluetooth (iPhone / BLE)
+      </button>
+      <button id="btn-connect-usb" class="btn btn-secondary-usb" title="Connect via USB-C Web Serial (115200 baud)">
+        Connect USB
+      </button>
+      <button id="btn-demo-mode" class="btn btn-demo" title="Run interactive 3D Knee Flexion/Extension simulation">
+        3D Demo
+      </button>
+      <a href="./iphone.html" class="btn btn-sm" style="text-decoration:none; background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc; font-weight:800; padding:0.42rem 0.7rem; border-radius:9px;" title="Open dedicated single-screen iPhone Direct Bluetooth controller">
+        &#x1F4F1; Simple iPhone View
+      </a>
+      <button id="btn-open-help" class="btn btn-icon-only" title="Sleeve Placement, Wiring &amp; iPhone Guide">
+        ?
+      </button>
+    </div>
+  </header>
+
+  <!-- Floating / Inline Calibration & Recording Toast Banner -->
+  <div id="status-toast" class="status-toast" style="display:none;">
+    <span id="status-toast-text">Calibrated Standing Pose (0&deg;, 0&deg;, 0&deg;) &mdash; Recording Live</span>
+  </div>
+
+  <!-- Primary Touch-Friendly Action Bar (iPhone & Laptop) -->
+  <section class="action-bar-section">
+    <div class="primary-actions-grid">
+      <button id="btn-record" class="btn btn-action-big btn-record" title="Immediately calibrates standing neutral pose (0°, 0°, 0°) to eliminate drift and starts recording">
+        <span class="rec-dot"></span>
+        <span id="btn-record-label">Start Recording (Auto-Calibrates Standing 0&deg;)</span>
+      </button>
+
+      <button id="btn-calibrate-neutral" class="btn btn-action-big btn-cal" title="Zero all 3D joint angles and calibrate stationary gyro bias right now">
+        Zero / Calibrate Now (0&deg;)
+      </button>
+
+      <button id="btn-reset-sys" class="btn btn-action-big btn-reset" title="Reset XIAO timer, orientation filters, and ROM statistics">
+        Reset
+      </button>
+
+      <button id="btn-export-csv" class="btn btn-action-big btn-export" disabled title="Share via iPhone AirDrop/Files or download CSV">
+        Export / Share CSV
+      </button>
+    </div>
+
+    <!-- Compact System Telemetry Status Strip -->
+    <div class="compact-telemetry-bar">
+      <div class="telemetry-chip">
+        <span class="chip-label">Status:</span>
+        <span id="cal-status-badge" class="badge">Uncalibrated (Stand Still &amp; Record)</span>
+      </div>
+      <div class="telemetry-chip">
+        <span class="chip-label">Time:</span>
+        <strong id="val-time">0.00</strong><span class="chip-unit">s</span>
+      </div>
+      <div class="telemetry-chip">
+        <span class="chip-label">Total 3D:</span>
+        <strong id="val-tot-angle" class="color-tot">0.0</strong><span class="chip-unit">&deg;</span>
+      </div>
+      <div class="telemetry-chip">
+        <span class="chip-label">Ang Vel:</span>
+        <strong id="val-ang-vel">0.0</strong><span class="chip-unit">&deg;/s</span>
+      </div>
+      <div class="telemetry-chip">
+        <span class="chip-label">Reps:</span>
+        <strong id="val-reps-top">0</strong>
+      </div>
+      <div class="telemetry-chip">
+        <span class="chip-label">Samples:</span>
+        <strong id="record-count-badge">0 samples</strong>
+        <span id="record-time-badge" class="rec-timer-pill">00:00.0</span>
+      </div>
+      <div class="telemetry-chip">
+        <span class="chip-label">Battery:</span>
+        <strong id="val-batt">4.12</strong><span class="chip-unit">V (<span id="val-batt-pct">94</span>%)</span>
+      </div>
+      <div class="telemetry-chip">
+        <span class="chip-label">Rate:</span>
+        <strong id="val-hz">--</strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 Large, Easy-to-Read Live Angle Cards & Horizon Gauges -->
+  <section class="angle-cards-section">
+    <!-- Primary Axis: Flexion / Extension -->
+    <div class="angle-hero-card card-fe">
+      <div class="angle-card-top">
+        <div>
+          <div class="angle-plane-tag">Primary Sagittal Plane</div>
+          <h3 id="lbl-gauge-p1" class="angle-card-title">Knee Flexion (+) / Extension (-)</h3>
+        </div>
+        <span id="lbl-metric-p1" class="angle-short-pill">Flex / Ext</span>
+      </div>
+      <div class="angle-hero-readout color-fe">
+        <span id="val-fe">0.0</span><span class="angle-deg-unit">&deg;</span>
+      </div>
+      <div class="gauge-bar-wrapper">
+        <div id="bar-fe-fill" class="gauge-bar-fill" style="width:50%; background:var(--plane-fe);"></div>
+      </div>
+      <div class="angle-card-sub">
+        <span>Standing Neutral: <strong>0&deg;</strong></span>
+        <span id="hud-fe-val">0.0&deg;</span>
+        <span>Full Flexion: <strong>140&deg;</strong></span>
+      </div>
+    </div>
+
+    <!-- Secondary Axis: Varus / Valgus (Ab/Adduction) -->
+    <div class="angle-hero-card card-ru">
+      <div class="angle-card-top">
+        <div>
+          <div class="angle-plane-tag">Frontal Coronal Plane</div>
+          <h3 id="lbl-gauge-p2" class="angle-card-title">Varus (+) / Valgus (-) Ab/Add</h3>
+        </div>
+        <span id="lbl-metric-p2" class="angle-short-pill">Varus / Valgus</span>
+      </div>
+      <div class="angle-hero-readout color-ru">
+        <span id="val-ru">0.0</span><span class="angle-deg-unit">&deg;</span>
+      </div>
+      <div class="gauge-bar-wrapper">
+        <div id="bar-ru-fill" class="gauge-bar-fill" style="width:50%; background:var(--plane-ru);"></div>
+      </div>
+      <div class="angle-card-sub">
+        <span>Valgus (-)</span>
+        <span id="hud-ru-val">0.0&deg;</span>
+        <span>Varus (+)</span>
+      </div>
+    </div>
+
+    <!-- Tertiary Axis: Internal / External Axial Rotation -->
+    <div class="angle-hero-card card-ps">
+      <div class="angle-card-top">
+        <div>
+          <div class="angle-plane-tag">Transverse Axial Plane</div>
+          <h3 id="lbl-gauge-p3" class="angle-card-title">Tibial Int (+) / Ext (-) Rotation</h3>
+        </div>
+        <span id="lbl-metric-p3" class="angle-short-pill">Int / Ext Rot</span>
+      </div>
+      <div class="angle-hero-readout color-ps">
+        <span id="val-ps">0.0</span><span class="angle-deg-unit">&deg;</span>
+      </div>
+      <div class="gauge-bar-wrapper">
+        <div id="bar-ps-fill" class="gauge-bar-fill" style="width:50%; background:var(--plane-ps);"></div>
+      </div>
+      <div class="angle-card-sub">
+        <span>External (-)</span>
+        <span id="hud-ps-val">0.0&deg;</span>
+        <span>Internal (+)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Responsive 2-Column Workspace (Stacks cleanly on iPhone) -->
+  <main class="app-container">
+
+    <!-- Left Column: 3D Anatomical Joint Viewer Card -->
+    <section class="panel">
+      <div class="panel-header">
+        <h2>
+          3D Anatomical Joint Viewer (<span id="lbl-3d-segments">Thigh S1 [0x69] &rarr; Lower Leg S2 [0x68]</span>)
+        </h2>
+        <div class="viewer-header-btns">
+          <button id="btn-hud-cal" class="btn btn-sm btn-cal">Zero 0&deg;</button>
+          <button id="btn-toggle-axes" class="btn btn-sm">Hide Axes</button>
+          <button id="btn-reset-cam" class="btn btn-sm">Reset View</button>
+        </div>
+      </div>
+
+      <div class="panel-body">
+        <!-- Three.js 3D Viewport -->
+        <div id="canvas-container" class="canvas-container">
+          <div class="canvas-hud-top">
+            <div class="hud-pill">
+              Sleeve Display: Anterior Thigh &bull; S1 (0x69): Lateral Thigh &bull; S2 (0x68): Lateral Shank
+            </div>
+          </div>
+        </div>
+
+        <!-- Compact Live Mirror of the XIAO 1.14" Landscape Display & Quick Board Controls -->
+        <div class="xiao-deck">
+          <div class="xiao-screen-frame" title="Live mirror of the Seeed XIAO 1.14&quot; IPS Display (240x135 Landscape)">
+            <div class="xiao-lcd-header">
+              <span id="lcd-hdr-left">1/4 KNEE 3D [RAW]</span>
+              <span id="lcd-hdr-right">BAT:94%</span>
+            </div>
+            <div class="xiao-lcd-body">
+              <div id="lcd-line-1" style="color:#38bdf8;">Flx/Ext:  +0.0 deg</div>
+              <div id="lcd-line-2" style="color:#34d399;">Var/Val:  +0.0 deg</div>
+              <div id="lcd-line-3" style="color:#fbbf24;">Int/Ext:  +0.0 deg</div>
+            </div>
+            <div class="xiao-lcd-footer">
+              <span id="lcd-ftr-left">STRM:ON | IDLE</span>
+              <span id="lcd-ftr-right">-- Hz</span>
+            </div>
+          </div>
+
+          <div class="xiao-controls-info">
+            <div class="xiao-controls-title">
+              On-Sleeve XIAO 1.14&quot; Display &amp; Remote Sync
+            </div>
+            <div class="xiao-btn-row">
+              <button id="btn-hw-screen" class="btn-hw" title="Cycle XIAO Display Screen (1/4 to 4/4)">
+                Next Screen
+              </button>
+              <button id="btn-hw-cal" class="btn-hw" title="Calibrate Standing Neutral Pose (0°)">
+                Zero Pose (0&deg;)
+              </button>
+              <button id="btn-hw-stream" class="btn-hw" title="Pause or Resume Telemetry Stream">
+                Pause/Resume
+              </button>
+              <button id="btn-hw-rec" class="btn-hw" title="Start or Stop Recording">
+                Rec Toggle
+              </button>
+              <button id="btn-dump-mem" class="btn-hw" title="Download locally stored SRAM ring-buffer samples from XIAO">
+                Dump XIAO Mem
+              </button>
+            </div>
+            <div class="imu-mag-readout">
+              <span>S1 |A|: <strong id="val-s1-amag">9.81</strong> m/s&sup2;</span>
+              <span>&bull;</span>
+              <span>S2 |A|: <strong id="val-s2-amag">9.81</strong> m/s&sup2;</span>
+              <button id="btn-toggle-stream" class="btn btn-sm" style="margin-left:auto;">Pause Stream</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Real-Time Multi-Axis Chart & Range of Motion (ROM) Summary Table -->
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Real-Time Multi-Axis Chart &amp; ROM Summary</h2>
+        <div class="chart-controls">
+          <button class="tab-btn active" data-tab="angles">3D Angles (&deg;)</button>
+          <button class="tab-btn" data-tab="gyro">Ang Vel (&deg;/s)</button>
+          <button class="tab-btn" data-tab="accel">Accel (m/s&sup2;)</button>
+          <span class="chart-divider">|</span>
+          <button class="tab-btn" data-window="5">5s</button>
+          <button class="tab-btn active" data-window="10">10s</button>
+          <button class="tab-btn" data-window="30">30s</button>
+          <button id="btn-pause-chart" class="btn btn-sm">Pause</button>
+        </div>
+      </div>
+
+      <div class="panel-body">
+        <div class="chart-wrapper">
+          <canvas id="live-chart"></canvas>
+        </div>
+
+        <!-- Range of Motion (ROM) Summary Table -->
+        <div class="analytics-box">
+          <div class="analytics-header">
+            <h3>Range of Motion (ROM) Summary</h3>
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+              <span id="rep-counter-badge" class="badge badge-accent">Reps: 0</span>
+              <button id="btn-reset-rom" class="btn btn-sm">Reset ROM</button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="analytics-table">
+              <thead>
+                <tr>
+                  <th>Joint Axis</th>
+                  <th>Now (&deg;)</th>
+                  <th>Min (&deg;)</th>
+                  <th>Max (&deg;)</th>
+                  <th>ROM Span (&deg;)</th>
+                  <th>Mean (&deg;)</th>
+                  <th>Peak (&deg;/s)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td id="rom-name-p1" style="color:var(--plane-fe); font-weight:700;">Flex / Ext</td>
+                  <td id="rom-cur-fe">0.0</td>
+                  <td id="rom-min-fe">0.0</td>
+                  <td id="rom-max-fe">0.0</td>
+                  <td id="rom-span-fe" style="font-weight:700;">0.0</td>
+                  <td id="rom-mean-fe">0.0</td>
+                  <td id="rom-pkv-fe">0.0</td>
+                </tr>
+                <tr>
+                  <td id="rom-name-p2" style="color:var(--plane-ru); font-weight:700;">Varus / Valgus</td>
+                  <td id="rom-cur-ru">0.0</td>
+                  <td id="rom-min-ru">0.0</td>
+                  <td id="rom-max-ru">0.0</td>
+                  <td id="rom-span-ru" style="font-weight:700;">0.0</td>
+                  <td id="rom-mean-ru">0.0</td>
+                  <td id="rom-pkv-ru">0.0</td>
+                </tr>
+                <tr>
+                  <td id="rom-name-p3" style="color:var(--plane-ps); font-weight:700;">Int / Ext Rot</td>
+                  <td id="rom-cur-ps">0.0</td>
+                  <td id="rom-min-ps">0.0</td>
+                  <td id="rom-max-ps">0.0</td>
+                  <td id="rom-span-ps" style="font-weight:700;">0.0</td>
+                  <td id="rom-mean-ps">0.0</td>
+                  <td id="rom-pkv-ps">0.0</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Collapsible Advanced Diagnostics: Recorded Data Preview & Command Console -->
+  <section class="bottom-section">
+    <details class="diagnostics-drawer">
+      <summary class="diagnostics-summary">
+        <span>Recorded Session Data Preview &amp; Bidirectional BLE/USB Command Console</span>
+        <span class="drawer-hint">Tap to expand / collapse</span>
+      </summary>
+
+      <div class="diagnostics-grid">
+        <!-- Session Recording Buffer -->
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Recorded Samples</h2>
+            <button id="btn-clear-record" class="btn btn-sm">Clear Buffer</button>
+          </div>
+          <div class="panel-body">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Time (s)</th>
+                    <th>Flx/Ext (&deg;)</th>
+                    <th>Var/Val (&deg;)</th>
+                    <th>Int/Ext (&deg;)</th>
+                    <th>S1 |A|</th>
+                    <th>S2 |A|</th>
+                    <th>S1 |G|</th>
+                    <th>S2 |G|</th>
+                  </tr>
+                </thead>
+                <tbody id="record-table-body">
+                  <tr>
+                    <td colspan="8" style="text-align:center; color:#94a3b8; padding:1.1rem;">
+                      Stand still and tap &ldquo;Start Recording (Auto-Calibrates Standing 0&deg;)&rdquo; to capture zero-drift knee kinematics.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bidirectional Command & Telemetry Console -->
+        <div class="panel">
+          <div class="panel-header">
+            <h2>BLE / USB Command Console</h2>
+            <div style="display:flex; gap:0.4rem; align-items:center;">
+              <label style="font-size:0.74rem; color:#64748b; display:flex; align-items:center; gap:0.25rem;">
+                <input type="checkbox" id="autoscroll-toggle" checked> Autoscroll
+              </label>
+              <button id="btn-clear-terminal" class="btn btn-sm">Clear</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div id="terminal-output" class="terminal-output"></div>
+            <div class="cmd-bar">
+              <input id="cmd-input" type="text" class="cmd-input" placeholder="Send command (e.g. CMD:REC_START, CMD:CAL_NEUTRAL, CMD:RESET)...">
+              <button id="btn-send-cmd" class="btn btn-primary btn-sm">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- Hardware, Knee Sleeve Placement & iPhone BLE Guide Modal -->
+  <div id="modal-help" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Knee Sleeve Sensor Placement &amp; iPhone Direct Bluetooth Guide</h2>
+        <button id="btn-close-help" class="btn btn-sm">Close</button>
+      </div>
+      <div class="modal-body">
+        <h3>1. Direct iPhone Bluetooth Connection (BLE)</h3>
+        <p>
+          To connect directly from an <strong>iPhone or iPad</strong> over Bluetooth Low Energy:
+        </p>
+        <pre>
+1. Install the free "Bluefy – Web BLE Browser" app from the iOS App Store.
+2. Power on the Knee Sleeve XIAO module (3.7V LiPo switch ON).
+3. Open this web app URL in Bluefy and tap "Connect Bluetooth (iPhone / BLE)".
+4. Select "XIAO-IMU" from the Bluetooth popup list.
+5. Have the subject stand upright and still, then tap:
+   "Start Recording (Auto-Calibrates Standing 0°)"
+        </pre>
+
+        <h3>2. Knee Sleeve Hardware Mounting &amp; Daisy-Chained I2C Wiring</h3>
+        <pre>
+[Seeed XIAO 1.14" IPS Display (nRF52840)]  --> Mounted on ANTERIOR DISTAL THIGH (above patella)
+       │  I2C Bus @ 400 kHz Fast Mode (SDA = D4, SCL = D5)
+       ▼
+[Sensor #1: Adafruit ICM-20948 (0x69)]     --> Mounted on LATERAL DISTAL THIGH (back AD0 jumper OPEN)
+       │  4-Pin JST SH (STEMMA QT) Flexible Cable across lateral knee joint line
+       ▼
+[Sensor #2: Adafruit ICM-20948 (0x68)]     --> Mounted on LATERAL PROXIMAL SHANK (back AD0 jumper SOLDERED)
+        </pre>
+      </div>
+    </div>
+  </div>
+
+  <script src="./joint3d.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

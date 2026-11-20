@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+firmware_setup/
+*.docx
+*.uf2
+*.zip
